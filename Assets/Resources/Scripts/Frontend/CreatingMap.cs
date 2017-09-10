@@ -1,50 +1,85 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System;
+using UnityEngine.UI;
+using UniRx;
 
-public class Positions{
+public class Positions {
     public double Latitude;
     public double Longitude;
 }
 
+public class MeterPos {
+    public float x;
+    public float y;
+}
 
 public class CreatingMap : MonoBehaviour {
-    GUITexture mapGuiTexture;
-    private int width = 400;
-    private int height = 800;
-    private double longitudeMetor;
-    private double latitudeMetor;
-    private int zoom = 13;          //半径3kmぐらい
-    private string AddComment;
-    private Positions GPS;
+    private int zoom = 14;          //半径3kmぐらい
+    private Positions GPS = new Positions();
+    private MeterPos pos = new MeterPos();
+    public Image icon;
+    public Image taxi;
+
+    private Positions sm = new Positions();
 
     public static CreatingMap Instance;
-    void Awake()
-    {
+    void Awake() {
+        GPS.Longitude = 35.70902;
+        GPS.Latitude = 139.73199;
         Instance = (CreatingMap)this;
-        mapGuiTexture = this.GetComponent<GUITexture> ();
+        GetMap();
     }
 
     public void GetMap () {
-        StartCoroutine (GetGPS());
-        GPS.Longitude = Input.location.lastData.longitude;
-        GPS.Latitude = Input.location.lastData.latitude;
+        //StartCoroutine (GetGPS());
+        //GPS.Longitude = Input.location.lastData.longitude;
+        //GPS.Latitude = Input.location.lastData.latitude;
 
-        AddComment = "";
-        // for (int i=0;i<StateManager.Instance.commentList.Length;i++){
-        //     AddComment += "&markers=size:mid%7Ccolor:blue%7C" + StateManager.Instance.commentList[i].lat + "," + StateManager.Instance.commentList[i].lng;
-        // }
         StartCoroutine(GetStreetViewImage(GPS.Longitude, GPS.Latitude, zoom));
+        UpDateComment();
+    }
+
+    public void UpdateTaxi() {
+        Positions compos = new Positions();
+        int distance = CalculateDistance(10,10);
+        GameObject tmp = (GameObject)Instantiate (taxi.gameObject, GameObject.Find("CursorCanvas").transform);
+        tmp.GetComponent<RectTransform>().localPosition +=  new Vector3(pos.x, pos.y, 0);
+        //tmp.GetComponent<Image>().sprite = ;
+        tmp.SetActive(true);
+    }
+
+
+    private void UpDateComment() {
+        foreach ( Transform n in icon.transform.parent ) { //子オブジェクトを全て破壊
+            if (n.gameObject != icon.gameObject && n.gameObject != taxi.gameObject)GameObject.Destroy(n.gameObject);
+        }
+        // for (int i = 0; i < StateManager.Instance.commentList.Length; i++) {
+        //     int distance = CalculateDistance(StateManager.Instance.commentList[i].lat, StateManager.Instance.commentList[i].lng);
+        //     GameObject tmp = (GameObject)Instantiate (icon.gameObject, GameObject.Find("CursorCanvas").transform);
+        //     tmp.GetComponent<RectTransform>().localPosition +=  new Vector3(pos.x, pos.y, 0);
+        //     tmp.SetActive(true);
+        // }
+
+
+        pos = new MeterPos();
+        int distance = CalculateDistance(139.73372,35.70663);
+        GameObject tmp = (GameObject)Instantiate (icon.gameObject, GameObject.Find("CursorCanvas").transform);
+        tmp.GetComponent<RectTransform>().localPosition +=  new Vector3(pos.x, pos.y, 0);
+        tmp.SetActive(true);
+
+        pos = new MeterPos();
+        distance = CalculateDistance(GPS.Latitude, GPS.Longitude);
+        tmp = (GameObject)Instantiate (icon.gameObject, GameObject.Find("CursorCanvas").transform);
+        tmp.GetComponent<RectTransform>().localPosition +=  new Vector3(pos.x, pos.y, 0);
+        tmp.SetActive(true);
     }
 
     private IEnumerator GetStreetViewImage(double latitude, double longitude, double zoom) {
-        //現在地マーカーはここの「&markers」以下で編集可能
-        string url = "http://maps.googleapis.com/maps/api/staticmap?center=" + latitude + "," + longitude + "&zoom=" + zoom + "&size=" + width + "x" + height +
-                     "&markers=size:mid%7Ccolor:red%7C" + latitude + "," + longitude + AddComment;
+        string url = "http://maps.googleapis.com/maps/api/staticmap?center=" + latitude + "," + longitude + "&zoom=" + zoom + "&size=" + 400 + "x" + 400 + "";
         WWW www = new WWW(url);
         yield return www;
-        mapGuiTexture.texture = www.texture;
-        mapGuiTexture.color = new Color (mapGuiTexture.color.r, mapGuiTexture.color.g, mapGuiTexture.color.b, 0.4f);
+        GetComponent<Renderer>().material.mainTexture = www.texture;
     }
 
     private IEnumerator GetGPS() {
@@ -78,40 +113,25 @@ public class CreatingMap : MonoBehaviour {
 
     static double deg2rad(double deg)
     {
-        return (deg / 180) * Math.PI;
+        return (deg / 180.0) * Math.PI;
     }
 
-    public static int CalculateDistance(Positions posA, Positions posB)
+    public int CalculateDistance(double lat, double lng)
     {
-        // 2点の緯度の平均
-        double latAvg = deg2rad(posA.Latitude + ((posB.Latitude - posA.Latitude) / 2));
-        // 2点の緯度差
-        double latDifference = deg2rad(posA.Latitude - posB.Latitude);
-        // 2点の経度差
-        double lonDifference = deg2rad(posA.Longitude - posB.Longitude);
+        double earth_r = 6378.137;
+        double laRe, loRe, NSD, EWD, distance;
 
-        double curRadiusTemp = 1 - 0.00669438 * Math.Pow(Math.Sin(latAvg), 2);
-        // 子午線曲率半径
-        double meridianCurvatureRadius = 6335439.327 / Math.Sqrt(Math.Pow(curRadiusTemp, 3));
-        // 卯酉線曲率半径
-        double primeVerticalCircleCurvatureRadius = 6378137 / Math.Sqrt(curRadiusTemp);
+        laRe = deg2rad(lat- GPS.Latitude);
+        loRe = deg2rad(lng - GPS.Longitude);
 
-        // 2点間の距離
-        double distance = Math.Pow(meridianCurvatureRadius * latDifference, 2)
-                          + Math.Pow(primeVerticalCircleCurvatureRadius * Math.Cos(latAvg) * lonDifference, 2);
+        NSD = earth_r * laRe;
+        EWD = Math.Cos(deg2rad(lat)) * earth_r * loRe;
+        distance = Math.Sqrt(Math.Pow(NSD, 2) + Math.Pow(EWD, 2));
 
-        distance = Math.Sqrt(distance);
+        pos.x = (float)(NSD/10000*(System.Math.Pow(2f, zoom)) ) ;
+        pos.y -= (float)(EWD/10000*(System.Math.Pow(2f, zoom)) );
 
         return (int)Math.Round(distance);
-    }
-
-
-
-    private int getRealDistance(int meter) {
-        double equator = 40075334.2563;
-        double disPerPix = equator / 256;
-        double disInPix = meter * (System.Math.Pow(2, zoom)) / disPerPix;
-        return (int) disInPix;
     }
 
 
