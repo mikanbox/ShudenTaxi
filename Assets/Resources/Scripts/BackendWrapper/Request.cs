@@ -62,7 +62,7 @@ public class MakeIDRequest : Request
 			{
 				if (request.isError)
 				{
-					Debug.Log(request.url);
+					//Debug.Log(request.url);
 					Debug.LogError(request.error);
 					status = RequestStatus.Failure;
 				}
@@ -156,7 +156,7 @@ public class MatchingRequest : Request
 			{
 				if (request.isError)
 				{
-					Debug.Log(request.url);
+					//Debug.Log(request.url);
 					Debug.LogError(request.error);
 					status = RequestStatus.Failure;
 				}
