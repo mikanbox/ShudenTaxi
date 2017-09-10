@@ -107,7 +107,7 @@ public class StateManager : SingletonMonoBehaviour<StateManager>
 		}
 	}
 }
-
+[System.Serializable]
 public class Comment
 {
 	public int id;

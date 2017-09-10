@@ -12,8 +12,8 @@ public class UIManager : SingletonMonoBehaviour<UIManager> {
     [SerializeField]private GameObject StatusBar;
     [SerializeField]private Text ErrorMes;
 
-    private float here_lat,here_lng;
-    private float test_lat = 139.73099f,test_lng = 35.70902f;
+    private float here_lat, here_lng;
+    private float test_lat = 139.73099f, test_lng = 35.70902f;
 
     private static float interval = 0;
     private UIState uiState = 0;
@@ -24,13 +24,14 @@ public class UIManager : SingletonMonoBehaviour<UIManager> {
             StartCoroutine (CreatingMap.Instance.GetGPS());
             here_lng = Input.location.lastData.longitude;
             here_lat = Input.location.lastData.latitude;
-#elif UNITY_EDITOR 
+#elif UNITY_EDITOR
             here_lng = test_lng;
             here_lat = test_lat;
 #endif
-            if (uiState == UIState.Map)CreatingMap.Instance.UpDateComment();
-            interval = 60;
+            interval = 10;
             //Debug.Log("commentLoad");
+            //if (StateManager.Instance.commentList != null)Debug.Log("commentNum"+StateManager.Instance.commentList.Length);
+            //if (StateManager.Instance.commentList != null)Debug.Log("commentNum"+StateManager.Instance.commentList[3].comment_body);
         }
         interval -= Time.deltaTime;
     }
@@ -41,21 +42,25 @@ public class UIManager : SingletonMonoBehaviour<UIManager> {
         StateManager.Instance.ObserveEveryValueChanged(x => x.uiState).Subscribe( _ => WindowChange());
         StateManager.Instance.ObserveEveryValueChanged(x => x.matchingState).Subscribe( _ => StatusBarManager());
         StateManager.Instance.ObserveEveryValueChanged(x => x.matchingRequestStatus).Subscribe( _ => LoadComment());
-        if (StateManager.Instance.userid==0)RequestSender.Instance.SubmitMakeIDRequest();//ユーザーidないとき
+        if (StateManager.Instance.userid == 0)RequestSender.Instance.SubmitMakeIDRequest(); //ユーザーidないとき
     }
 
     public void StatusBarManager() {//MatchingStateが変わった時よばれる
         StatusBar.SetActive((StateManager.Instance.matchingState == MatchingState.Matching));
-        if (StateManager.Instance.matchingState == MatchingState.Matched){
-            CreatingMap.Instance.UpdateTaxi(StateManager.Instance.taxi_lat,StateManager.Instance.taxi_lng);
+        if (StateManager.Instance.matchingState == MatchingState.Matched) {
+            CreatingMap.Instance.UpdateTaxi(StateManager.Instance.taxi_lat, StateManager.Instance.taxi_lng);
+        }
+        if (StateManager.Instance.matchingState == MatchingState.TaxiCome) {
+            WindowObj[2].SetActive(false);
+            WindowObj[4].SetActive(true);
         }
     }
 
-    public void LoadComment(){
-        //if (StateManager.Instance.matchingRequestStatus==RequestStatus.Failure){
-            //CreatingMap.Instance.UpDateComment();
-            //Debug.Log("TriggercommentLoad");
-        //}
+    public void LoadComment() {
+        if (StateManager.Instance.matchingRequestStatus == RequestStatus.Failure) {
+            CreatingMap.Instance.UpDateComment();
+            Debug.Log("TriggercommentLoad");
+        }
     }
 
     private void WindowChange() {
@@ -63,7 +68,8 @@ public class UIManager : SingletonMonoBehaviour<UIManager> {
         WindowObj[(int)StateManager.Instance.uiState].SetActive(true);
         Debug.Log("from:" + uiState + "to:" + StateManager.Instance.uiState);
         uiState = StateManager.Instance.uiState;
-        if (uiState == UIState.Map){    //マップに遷移した時はコメント読みこみ
+
+        if (uiState == UIState.Map) {   //マップに遷移した時はコメント読みこみ
             CreatingMap.Instance.GetMap();
             CreatingMap.Instance.UpDateComment();
         }
@@ -102,7 +108,7 @@ public class UIManager : SingletonMonoBehaviour<UIManager> {
 
 
     private IEnumerator GetLatLngfromString(string adress) {
-        string url = "http://maps.google.com/maps/api/geocode/json?address={0}&"+adress;
+        string url = "http://maps.google.com/maps/api/geocode/json?address={0}&" + adress;
         WWW www = new WWW(url);
         yield return www;
         Debug.Log(www);

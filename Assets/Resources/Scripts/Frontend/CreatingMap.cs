@@ -50,18 +50,18 @@ public class CreatingMap : MonoBehaviour {
             if (n.gameObject != icon.gameObject && n.gameObject != taxi.gameObject)GameObject.Destroy(n.gameObject);
         }
 
+        //if (StateManager.Instance.commentList != null)Debug.Log("commentNum"+StateManager.Instance.commentList[3].comment_body);
         if (StateManager.Instance.commentList != null) {
             for (int i = 0; i < StateManager.Instance.commentList.Length; i++) {
                 int distance = CalculateDistance(StateManager.Instance.commentList[i].comment_lat, StateManager.Instance.commentList[i].comment_lng);
                 GameObject tmp = (GameObject)Instantiate (icon.gameObject, GameObject.Find("CursorCanvas").transform);
                 tmp.GetComponent<RectTransform>().localPosition +=  new Vector3(pos.x, pos.y, 0);
-                //tmp.GetComponent<UICusor>().Comment = StateManager.Instance.commentList[i].comment_body;
+                tmp.GetComponent<UICusor>().Comment = StateManager.Instance.commentList[i].comment_body;
                 tmp.SetActive(true);
             }
         }else{
             Debug.Log("Not Comment");
         }
-
 
 
         // pos = new MeterPos();
