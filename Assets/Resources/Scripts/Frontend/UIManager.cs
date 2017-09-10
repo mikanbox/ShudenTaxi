@@ -21,7 +21,7 @@ public class UIManager : SingletonMonoBehaviour<UIManager> {
             StartCoroutine (CreatingMap.Instance.GetGPS());
             here_lng = Input.location.lastData.longitude;
             here_lat = Input.location.lastData.latitude;
-            
+
             if (uiState == UIState.Map)CreatingMap.Instance.GetMap();
             interval = 60;
         }
@@ -35,7 +35,7 @@ public class UIManager : SingletonMonoBehaviour<UIManager> {
         StateManager.Instance.ObserveEveryValueChanged(x => x.matchingState).Subscribe( _ => StatusBarManager());
         if (StateManager.Instance.userid==0)RequestSender.Instance.SubmitMakeIDRequest();
     }
-
+    
 
     public void StatusBarManager() {
         StatusBar.SetActive((StateManager.Instance.matchingState == MatchingState.Matching));
@@ -63,7 +63,7 @@ public class UIManager : SingletonMonoBehaviour<UIManager> {
     public void SubmitMatchingRequest() {
         if (SendingMessage.text != "") {
             MatchingRequest.RequestData data = new MatchingRequest.RequestData();
-            data.userid = StateManager.Instance.userid;
+            data.userid = 15;//StateManager.Instance.userid;
             data.here_lat = here_lat;
             data.here_lng = here_lng;
             data.obj_lat = StateManager.Instance.obj_lat;
