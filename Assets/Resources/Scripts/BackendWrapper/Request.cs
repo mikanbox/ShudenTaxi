@@ -62,7 +62,7 @@ public class MakeIDRequest : Request
 			{
 				if (request.isError)
 				{
-					Debug.Log(request.url);
+					//Debug.Log(request.url);
 					Debug.LogError(request.error);
 					status = RequestStatus.Failure;
 				}
@@ -137,7 +137,7 @@ public class MatchingRequest : Request
 
 		WWWForm postData = new WWWForm();
 		postData.AddField("userid", data.userid);
-		postData.AddField("comment", data.comment);
+		postData.AddField("comment_body", data.comment);
 		postData.AddField("here_lat", data.here_lat.ToString());
 		postData.AddField("here_lng", data.here_lng.ToString());
 		postData.AddField("obj_lat", data.obj_lat.ToString());
@@ -156,7 +156,7 @@ public class MatchingRequest : Request
 			{
 				if (request.isError)
 				{
-					Debug.Log(request.url);
+					//Debug.Log(request.url);
 					Debug.LogError(request.error);
 					status = RequestStatus.Failure;
 				}
@@ -209,10 +209,12 @@ public class SettingConfirmRequest : Request
 	public void OnSendRequest(SettingConfirmRequest.RequestData data)
 	{
 		SetObjPostiion(data.obj_lat, data.obj_lng);
+		SetUIState(UIState.Title);
 	}
 
 	//Action
 	public System.Action<float, float> SetObjPostiion;
+	public System.Action<UIState> SetUIState;
 }
 
 public class ChangeToSettingUIRequest : Request
