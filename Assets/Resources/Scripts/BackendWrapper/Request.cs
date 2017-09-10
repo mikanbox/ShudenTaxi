@@ -209,10 +209,12 @@ public class SettingConfirmRequest : Request
 	public void OnSendRequest(SettingConfirmRequest.RequestData data)
 	{
 		SetObjPostiion(data.obj_lat, data.obj_lng);
+		SetUIState(UIState.Title);
 	}
 
 	//Action
 	public System.Action<float, float> SetObjPostiion;
+	public System.Action<UIState> SetUIState;
 }
 
 public class ChangeToSettingUIRequest : Request
