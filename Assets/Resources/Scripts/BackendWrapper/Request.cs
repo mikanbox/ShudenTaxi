@@ -73,6 +73,8 @@ public class MakeIDRequest : Request
 						string rawJson = request.downloadHandler.text;
 						RequestAnswerData answer = JsonUtility.FromJson<RequestAnswerData>(rawJson);
 						SetUserID(answer.userid);
+
+
 						status = RequestStatus.Success;
 					}
 					else
@@ -93,10 +95,11 @@ public class MakeIDRequest : Request
 
 public class MatchingRequest : Request
 {
-	public static readonly string REQUEST_URL = BackendWrapperConf.APIURL + "/matching/" + StateManager.Instance.userid;
+	public static readonly string REQUEST_URL = BackendWrapperConf.APIURL + "/feeling";
 	private UnityWebRequest request;
 	private AsyncOperation webRequestStatus;
 	private System.IDisposable requestEvent;
+	private System.IDisposable matchingRequester;
 
 	public MatchingRequest()
 	{
@@ -115,12 +118,13 @@ public class MatchingRequest : Request
 
 	public class AnswerData
 	{
-		public Comment[] commentList;
-		public bool isMatchingOK;
-		public string taxi_number;
-		public float? taxi_lat;
-		public float? taxi_lng;
+		public Comment[] comments;
+		public bool result;
 	}
+
+	public System.Action<Comment[]> SetComments;
+	public System.Action<MatchingState> SetMatchingState;
+	public System.Action<UIState> SetUIState;
 
 	private void OnSendRequest(RequestData data)
 	{
@@ -131,10 +135,17 @@ public class MatchingRequest : Request
 			return;
 		}
 
-		var dataAsDictionary = MiniJSON.Json.Deserialize(JsonUtility.ToJson(data)) as Dictionary<string,string>;
+		WWWForm postData = new WWWForm();
+		postData.AddField("userid", data.userid);
+		postData.AddField("comment", data.comment);
+		postData.AddField("here_lat", data.here_lat.ToString());
+		postData.AddField("here_lng", data.here_lng.ToString());
+		postData.AddField("obj_lat", data.obj_lat.ToString());
+		postData.AddField("obj_lng", data.obj_lng.ToString());
+		//dataAsDictionary = MiniJSON.Json.Deserialize(JsonUtility.ToJson(data)) as Dictionary<string,string>;
 
 		//リクエスト設定し、飛ばす。
-		request = UnityWebRequest.Post(REQUEST_URL,dataAsDictionary);
+		request = UnityWebRequest.Post(REQUEST_URL, postData);
 		webRequestStatus = request.Send();
 		status = RequestStatus.Sending;
 
@@ -154,20 +165,30 @@ public class MatchingRequest : Request
 					if (request.responseCode == 200)
 					{
 						string rawJson = request.downloadHandler.text;
-						var answer = MiniJSON.Json.Deserialize(rawJson) as Dictionary<string, string>;
-						
-						status = RequestStatus.Success;
+						var answer = JsonUtility.FromJson<AnswerData>(rawJson);
+						if (!answer.result)
+						{
+							Debug.LogError("APIError: matching failure");
+							status = RequestStatus.Failure;
+							SetMatchingState(MatchingState.CannotSendMatchingRequest);
+						}
+						else
+						{
+							status = RequestStatus.Success;
+							SetMatchingState(MatchingState.Matching);
+							SetUIState(UIState.Map);
+						}
 					}
 					else
 					{
-						Debug.LogError("MakeUserIDRequest:API doesn't return responseCode 200");
+						Debug.LogError("MatchingRequest:API doesn't return responseCode 200");
 						status = RequestStatus.Failure;
 					}
 				}
 
 				if (requestEvent != null)
-					requestEvent.Dispose();
-			
+						requestEvent.Dispose();
+
 			});
 	}
 }
