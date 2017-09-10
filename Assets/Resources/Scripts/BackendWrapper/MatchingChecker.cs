@@ -53,7 +53,7 @@ public class MatchingChecker : SingletonMonoBehaviour<MatchingChecker>
 		{
 			elapesedSeconds = 0;
 			//リクエスト設定し、飛ばす。
-			Debug.Log(REQUEST_URL);
+			//Debug.Log(REQUEST_URL);
 			request = UnityWebRequest.Get(REQUEST_URL);
 			webRequestStatus = request.Send();
 
@@ -71,7 +71,7 @@ public class MatchingChecker : SingletonMonoBehaviour<MatchingChecker>
 						if (request.responseCode == 200)
 						{
 							string rawJson = request.downloadHandler.text;
-							Debug.Log(rawJson);
+							//Debug.Log(rawJson);
 							AnswerData answer = JsonUtility.FromJson<AnswerData>(rawJson);
 							if (answer.result)
 							{

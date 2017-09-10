@@ -17,6 +17,7 @@ public class StateManager : SingletonMonoBehaviour<StateManager>
 	private ChangeToCommentUIRequest changeToCommentUIRequest;
 	private AddressToGeometryRequest addressToGeometryRequest;
 	private CountNogashiTimesRequest countNogashiTimesRequest;
+	private LikeFightSendRequest likeFightSendRequest;
 
 	//以下取得するもの
 	public int userid { get; private set; }
@@ -39,6 +40,7 @@ public class StateManager : SingletonMonoBehaviour<StateManager>
 	public RequestStatus changeToCommentUIRequestStatus { get { return changeToCommentUIRequest.status;} }
 	public RequestStatus addressToGeometryRequestStatus { get { return addressToGeometryRequest.status;} }
 	public RequestStatus countNogashiTImesRequestStatus { get { return countNogashiTimesRequest.status;} }
+	public RequestStatus likeFightSendRequestStatus { get { return likeFightSendRequest.status;} }
 
 	// Use this for initialization
 	protected override void Awake()
@@ -47,6 +49,11 @@ public class StateManager : SingletonMonoBehaviour<StateManager>
 		MakeRequestInstance();
 		SetRequestEvent();
         LoadData();
+		Initialize();
+	}
+
+	public void Initialize() {
+		commentList = new Comment[] { };
 	}
 
 	private void Start() {
@@ -68,6 +75,7 @@ public class StateManager : SingletonMonoBehaviour<StateManager>
 		changeToCommentUIRequest = new ChangeToCommentUIRequest();
 		addressToGeometryRequest = new AddressToGeometryRequest();
 		countNogashiTimesRequest = new CountNogashiTimesRequest();
+		likeFightSendRequest = new LikeFightSendRequest();
 	}
 
 	private void SetRequestEvent() {
@@ -114,6 +122,8 @@ public class StateManager : SingletonMonoBehaviour<StateManager>
 		};
 
 		countNogashiTimesRequest.SetUIState += (state) => uiState = state;
+
+		likeFightSendRequest.SetComments += (comments) => commentList = comments;
 	}
 
 	private void LoadData()
@@ -147,8 +157,8 @@ public class Comment
 	public float comment_lng;
 	public string comment_body;
 	public string comment_imgpath;
-	public string like;
-	public string fight;
+	public int like;
+	public int fight;
 	public string created_at;
 	public string updated_at;
 }
