@@ -23,11 +23,13 @@ public class StateManager : SingletonMonoBehaviour<StateManager>
 	public UIState uiState { get; private set; }
 	public MatchingState matchingState { get; private set; }
 
+
 	// Use this for initialization
 	protected override void Awake()
 	{
 		CheckInstance();
 		MakeRequestInstance();
+		SetRequestEvent();
 	}
 
 	// Update is called once per frame
@@ -44,6 +46,10 @@ public class StateManager : SingletonMonoBehaviour<StateManager>
 		settinfConfirmRequest = new SettingConfirmRequest();
 		changeToSettingUIRequest = new ChangeToSettingUIRequest();
 		changeToCommentUIRequest = new ChangeToCommentUIRequest();
+	}
+	private void SetRequestEvent() {
+		changeToCommentUIRequest.SetUIState += (UIState obj) => uiState = obj;
+		changeToSettingUIRequest.SetUIState += (UIState obj) => uiState = obj;
 	}
 
 }

@@ -31,7 +31,6 @@ public class MakeIDRequest : Request
 	private void OnSendRequest()
 	{
 		status = RequestStatus.Sending;
-
 		status = RequestStatus.Success;
 	}
 }
@@ -84,24 +83,32 @@ public class ChangeToSettingUIRequest : Request
 { 
 	public ChangeToSettingUIRequest()
 	{
-		
+		RequestSender.Instance.SubmitChangeToSettingUIRequest += OnSendRequest;
 	}
 
 	public void OnSendRequest()
-	{ 
-		
+	{
+		status = RequestStatus.Sending;
+		status = RequestStatus.Success;
+		SetUIState(UIState.Setting);
 	}
+
+	public System.Action<UIState> SetUIState;
 }
 
 public class ChangeToCommentUIRequest : Request
 { 
 	public ChangeToCommentUIRequest()
 	{
-
+		RequestSender.Instance.SubmitChangeToCommentUIRequest += OnSendRequest;
 	}
 
 	public void OnSendRequest() 
 	{ 
-		
+		status = RequestStatus.Sending;
+		status = RequestStatus.Success;
+        SetUIState(UIState.Setting);
 	}
+
+	public System.Action<UIState> SetUIState;
 }
