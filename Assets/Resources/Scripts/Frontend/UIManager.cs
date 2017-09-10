@@ -28,15 +28,20 @@ public class UIManager : SingletonMonoBehaviour<UIManager> {
         interval -= Time.deltaTime;
     }
 
+
     void Start() {
         CheckInstance();
         StateManager.Instance.ObserveEveryValueChanged(x => x.uiState).Subscribe( _ => WindowChange());
         StateManager.Instance.ObserveEveryValueChanged(x => x.matchingState).Subscribe( _ => StatusBarManager());
+        if (StateManager.Instance.userid==0)RequestSender.Instance.SubmitMakeIDRequest();
     }
+
 
     public void StatusBarManager() {
         StatusBar.SetActive((StateManager.Instance.matchingState == MatchingState.Matching));
-        if (StateManager.Instance.matchingState == MatchingState.Matched)CreatingMap.Instance.UpdateTaxi();
+        if (StateManager.Instance.matchingState == MatchingState.Matched){
+            CreatingMap.Instance.UpdateTaxi(StateManager.Instance.taxi_lat,StateManager.Instance.taxi_lng);
+        }
     }
 
     private void WindowChange() {
@@ -52,6 +57,7 @@ public class UIManager : SingletonMonoBehaviour<UIManager> {
         WindowObj[(int)StateManager.Instance.uiState].SetActive(true);
         Debug.Log("from:" + uiState + "to:" + StateManager.Instance.uiState);
         uiState = StateManager.Instance.uiState;
+        if (uiState == UIState.Map)CreatingMap.Instance.GetMap();
     }
 
     public void SubmitMatchingRequest() {
@@ -79,10 +85,9 @@ public class UIManager : SingletonMonoBehaviour<UIManager> {
 
     public void SubmitSettingConfirmRequest() {
         SettingConfirmRequest.RequestData data = new SettingConfirmRequest.RequestData();
-        data.obj_lat = 0;
-        data.obj_lng = 0;
+        data.obj_lat = 139.73199f;
+        data.obj_lng = 35.70902f;
         RequestSender.Instance.SubmitSettingConfirmRequest(data);
     }
-
 
 }

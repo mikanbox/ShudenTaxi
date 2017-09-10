@@ -40,8 +40,7 @@ public class CreatingMap : MonoBehaviour {
         UpDateComment();
     }
 
-    public void UpdateTaxi() {
-        Positions compos = new Positions();
+    public void UpdateTaxi(float lat,float lng) {
         int distance = CalculateDistance(10, 10);
         GameObject tmp = (GameObject)Instantiate (taxi.gameObject, GameObject.Find("CursorCanvas").transform);
         tmp.GetComponent<RectTransform>().localPosition +=  new Vector3(pos.x, pos.y, 0);
@@ -56,12 +55,9 @@ public class CreatingMap : MonoBehaviour {
         }
         for (int i = 0; i < StateManager.Instance.commentList.Length; i++) {
             int distance = CalculateDistance(StateManager.Instance.commentList[i].comment_lat, StateManager.Instance.commentList[i].comment_lng);
-            if (distance < 1000) {
                 GameObject tmp = (GameObject)Instantiate (icon.gameObject, GameObject.Find("CursorCanvas").transform);
                 tmp.GetComponent<RectTransform>().localPosition +=  new Vector3(pos.x, pos.y, 0);
                 tmp.SetActive(true);
-            }
-
         }
 
 
