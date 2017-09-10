@@ -49,8 +49,8 @@ public class ItemWindow : MonoBehaviour {
         Oblist.Add("exp1num",exp1num.gameObject);
         Oblist.Add("exp2",exp2.gameObject);
         Oblist.Add("exp2num",exp2num.gameObject);
-        Oblist.Add("Image",icon1.gameObject);
-        Oblist.Add("Image2",icon2.gameObject);
+        Oblist.Add("icon1",icon1.gameObject);
+        Oblist.Add("icon2",icon2.gameObject);
         Oblist.Add("button1",button1.gameObject);
         Oblist.Add("button2",button2.gameObject);
 

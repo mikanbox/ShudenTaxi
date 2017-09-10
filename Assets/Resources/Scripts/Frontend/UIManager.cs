@@ -12,6 +12,7 @@ public class UIManager : SingletonMonoBehaviour<UIManager> {
     [SerializeField]private GameObject[] WindowObj;
     [SerializeField]private GameObject StatusBar;
     [SerializeField]private Text ErrorMes;
+    [SerializeField]private Text nogashiTimesMess;
 
     public float here_lat, here_lng;
     //private float test_lat = 35.70902f, test_lng = 139.73099f;
@@ -45,6 +46,11 @@ public class UIManager : SingletonMonoBehaviour<UIManager> {
         StateManager.Instance.ObserveEveryValueChanged(x => x.matchingState).Subscribe( _ => StatusBarManager());
         StateManager.Instance.ObserveEveryValueChanged(x => x.matchingRequestStatus).Subscribe( _ => LoadComment());
         if (StateManager.Instance.userid == 0)RequestSender.Instance.SubmitMakeIDRequest(); //ユーザーidないとき
+        if (StateManager.Instance.nogashiTimes!=0){
+            nogashiTimesMess.text = ""+(StateManager.Instance.nogashiTimes+1)+"回目!";
+            }else{
+                nogashiTimesMess.text = "初めて!";
+            }
     }
 
     public void StatusBarManager() {//MatchingStateが変わった時よばれる
@@ -117,14 +123,20 @@ public class UIManager : SingletonMonoBehaviour<UIManager> {
         }
     }
 
-    public void SubmitCommentLikeFightAdd(){
-        //RequestSender.Instance.SubmitAddressToGeometryRequest(Adress.text);
-        //StateManager .Instance.ObserveEveryValueChanged(x => x.addressToGeometryRequestStatus).Subscribe( _ => CompleteSettingRequest());
+    public void SubmitCommentLikeFightAdd(LikeFightSendRequest.CommentType type,int commentid){
+        Debug.Log("type"+type);
+        LikeFightSendRequest.RequestData data = new LikeFightSendRequest.RequestData();
+        data.comment_id = commentid;
+        data.type = type;  
+        RequestSender.Instance.SubmitLikeFightSendRequest(data);
+        StateManager .Instance.ObserveEveryValueChanged(x => x.likeFightSendRequestStatus).Subscribe( _ => CompleteSendLikeandGettingComment());
     }
 
     public void CompleteSendLikeandGettingComment(){
-
-        CreatingMap.Instance.UpDateComment();
+        if (StateManager.Instance.likeFightSendRequestStatus == RequestStatus.Success){
+            Debug.Log("GetComment");
+            CreatingMap.Instance.UpDateComment();
+        }
     }
 
 

@@ -47,7 +47,7 @@ public class CreatingMap : MonoBehaviour {
                 bool isexisted=false;
                 foreach ( Transform n in icon.transform.parent ) {
                     if (n.gameObject != icon.gameObject && n.gameObject != taxi.gameObject){
-                        if (n.GetComponent<UICusor>().userid == StateManager.Instance.commentList[i].userid )isexisted = true;
+                        if (n.GetComponent<UICusor>().id == StateManager.Instance.commentList[i].id )isexisted = true;
                     }
                 }
                 if (isexisted==true)continue;
@@ -57,9 +57,9 @@ public class CreatingMap : MonoBehaviour {
                 GameObject tmp = (GameObject)Instantiate (icon.gameObject, GameObject.Find("CursorCanvas").transform);
                 tmp.GetComponent<RectTransform>().localPosition +=  new Vector3(pos.x, pos.y, 0);
                 tmp.GetComponent<UICusor>().Comment = StateManager.Instance.commentList[i].comment_body;
-                tmp.GetComponent<UICusor>().userid = StateManager.Instance.commentList[i].userid;
-                //tmp.GetComponent<UICusor>().like  =StateManager.Instance.commentList[i].like;
-                //tmp.GetComponent<UICusor>().fight =StateManager.Instance.commentList[i].fight; 
+                tmp.GetComponent<UICusor>().id = StateManager.Instance.commentList[i].id;
+                tmp.GetComponent<UICusor>().like  =StateManager.Instance.commentList[i].like;
+                tmp.GetComponent<UICusor>().fight =StateManager.Instance.commentList[i].fight; 
                 tmp.SetActive(true);
             }
         }else{
