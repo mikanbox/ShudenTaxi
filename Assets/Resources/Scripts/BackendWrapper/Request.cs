@@ -513,5 +513,3 @@ public class LikeFightSendRequest : Request
 			});
 	}
 }
-
-
