@@ -137,7 +137,7 @@ public class MatchingRequest : Request
 
 		WWWForm postData = new WWWForm();
 		postData.AddField("userid", data.userid);
-		postData.AddField("comment", data.comment);
+		postData.AddField("comment_body", data.comment);
 		postData.AddField("here_lat", data.here_lat.ToString());
 		postData.AddField("here_lng", data.here_lng.ToString());
 		postData.AddField("obj_lat", data.obj_lat.ToString());
