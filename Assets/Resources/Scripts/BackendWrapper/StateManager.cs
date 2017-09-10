@@ -22,8 +22,12 @@ public class StateManager : SingletonMonoBehaviour<StateManager>
 	//以下取得するもの
 	public int userid { get; private set; }
 	public int nogashiTimes { get; private set;}
-	public float here_lat { get; private set;}
-	public float here_lng { get; private set; }
+	[SerializeField]
+	private float _here_lat;
+	public float here_lat { get { return _here_lat;	}}
+	[SerializeField]
+	private float _here_lng;
+	public float here_lng { get { return _here_lng;} }
 	public float obj_lat { get; private set; }
 	public float obj_lng { get; private set; }
 	public string taxi_number { get; private set; }
@@ -127,7 +131,7 @@ public class StateManager : SingletonMonoBehaviour<StateManager>
 
 		likeFightSendRequest.SetComments += (comments) => commentList = comments;
 
-		GPSRunner.Instance.SetHereLocation += (lat, lng) => { here_lat = lat; here_lng = lng;};
+		GPSRunner.Instance.SetHereLocation += (lat, lng) => { _here_lat = lat; _here_lng = lng;};
 
 		CommentsChecker.Instance.SetComments += (comments) => { commentList = comments; };
 	}
