@@ -22,6 +22,8 @@ public class StateManager : SingletonMonoBehaviour<StateManager>
 	//以下取得するもの
 	public int userid { get; private set; }
 	public int nogashiTimes { get; private set;}
+	public float here_lat { get; private set;}
+	public float here_lng { get; private set; }
 	public float obj_lat { get; private set; }
 	public float obj_lng { get; private set; }
 	public string taxi_number { get; private set; }
@@ -124,6 +126,10 @@ public class StateManager : SingletonMonoBehaviour<StateManager>
 		countNogashiTimesRequest.SetUIState += (state) => uiState = state;
 
 		likeFightSendRequest.SetComments += (comments) => commentList = comments;
+
+		GPSRunner.Instance.SetHereLocation += (lat, lng) => { here_lat = lat; here_lng = lng;};
+
+		CommentsChecker.Instance.SetComments += (comments) => { commentList = comments; };
 	}
 
 	private void LoadData()
