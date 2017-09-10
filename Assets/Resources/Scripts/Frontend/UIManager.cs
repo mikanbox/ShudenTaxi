@@ -114,7 +114,6 @@ public class UIManager : SingletonMonoBehaviour<UIManager> {
             data.obj_lat = StateManager.Instance.ad_lat;
             data.obj_lng = StateManager.Instance.ad_lng;
             RequestSender.Instance.SubmitSettingConfirmRequest(data);
-            Debug.Log("SetObj");
         }
     }
 

@@ -4,10 +4,6 @@ using System;
 using UnityEngine.UI;
 using UniRx;
 
-public class Positions {
-    public double Latitude;
-    public double Longitude;
-}
 
 public class MeterPos {
     public float x;
@@ -29,33 +25,41 @@ public class CreatingMap : MonoBehaviour {
 
     public void GetMap (double lat,double lng) {
         StartCoroutine(GetStreetViewImage(lng, lat, zoom));
-        //UpDateComment();
     }
 
     public void UpdateTaxi(float lat, float lng) {
         int distance = CalculateDistance(lat, lng);
         GameObject tmp = (GameObject)Instantiate (taxi.gameObject, GameObject.Find("CursorCanvas").transform);
         tmp.GetComponent<RectTransform>().localPosition +=  new Vector3(pos.x, pos.y, 0);
-        tmp.GetComponent<Image>().sprite = Resources.Load<Sprite>("Sprites/icon/HELP");
+        //tmp.GetComponent<Image>().sprite = Resources.Load<Sprite>("Sprites/icon/HELP");
         tmp.SetActive(true);
-        Debug.Log("taxiIcon");
+        //Debug.Log("taxiIcon");
     }
 
 
     public void UpDateComment() {
-        foreach ( Transform n in icon.transform.parent ) { //子オブジェクトを全て破壊
-            if (n.gameObject != icon.gameObject && n.gameObject != taxi.gameObject)GameObject.Destroy(n.gameObject);
-        }
+        // foreach ( Transform n in icon.transform.parent ) { //子オブジェクトを全て破壊
+        //     if (n.gameObject != icon.gameObject && n.gameObject != taxi.gameObject)GameObject.Destroy(n.gameObject);
+        // }
 
-        //if (StateManager.Instance.commentList != null)Debug.Log("commentNum"+StateManager.Instance.commentList[3].comment_body);
         if (StateManager.Instance.commentList != null) {
             for (int i = 0; i < StateManager.Instance.commentList.Length; i++) {
+                bool isexisted=false;
+                foreach ( Transform n in icon.transform.parent ) {
+                    if (n.gameObject != icon.gameObject && n.gameObject != taxi.gameObject){
+                        if (n.GetComponent<UICusor>().userid == StateManager.Instance.commentList[i].userid )isexisted = true;
+                    }
+                }
+                if (isexisted==true)continue;
+
                 pos = new MeterPos();
-                //Debug.Log("Comlat"+StateManager.Instance.commentList[i].comment_lat);
                 int distance = CalculateDistance(StateManager.Instance.commentList[i].comment_lat, StateManager.Instance.commentList[i].comment_lng);
                 GameObject tmp = (GameObject)Instantiate (icon.gameObject, GameObject.Find("CursorCanvas").transform);
                 tmp.GetComponent<RectTransform>().localPosition +=  new Vector3(pos.x, pos.y, 0);
                 tmp.GetComponent<UICusor>().Comment = StateManager.Instance.commentList[i].comment_body;
+                tmp.GetComponent<UICusor>().userid = StateManager.Instance.commentList[i].userid;
+                tmp.GetComponent<UICusor>().like  =10;
+                tmp.GetComponent<UICusor>().fight =10; 
                 tmp.SetActive(true);
             }
         }else{
