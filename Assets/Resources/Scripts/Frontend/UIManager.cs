@@ -16,25 +16,16 @@ public class UIManager : SingletonMonoBehaviour<UIManager> {
 
     public float here_lat, here_lng;
     //private float test_lat = 35.70902f, test_lng = 139.73099f;
-    private float test_lat = 35.25289f, test_lng = 139.0007f;
+    private float test_lat = 35.25059f, test_lng = 139.0007f;
 
     private static float interval = 0;
     private UIState uiState = 0;
 
     void Update () {
         if (interval < 0) {
-// #if UNITY_ANDROID || UNITY_IPHONE
-//             StartCoroutine (CreatingMap.Instance.GetGPS());
-//             here_lng = Input.location.lastData.longitude;
-//             here_lat = Input.location.lastData.latitude;
-// #elif UNITY_EDITOR
-            here_lng = test_lng;
-            here_lat = test_lat;
-// #endif
-            interval = 10;
-            //Debug.Log("commentLoad");
-            //if (StateManager.Instance.commentList != null)Debug.Log("commentNum"+StateManager.Instance.commentList.Length);
-            //if (StateManager.Instance.commentList != null)Debug.Log("commentNum"+StateManager.Instance.commentList[3].comment_body);
+            CompleteSendLikeandGettingComment();
+
+            interval = 5f;
         }
         interval -= Time.deltaTime;
     }
@@ -87,8 +78,8 @@ public class UIManager : SingletonMonoBehaviour<UIManager> {
         if (SendingMessage.text != "") {
             MatchingRequest.RequestData data = new MatchingRequest.RequestData();
             data.userid = StateManager.Instance.userid; //送るid
-            data.here_lat = here_lat;
-            data.here_lng = here_lng;
+            data.here_lat = StateManager.Instance.here_lat;
+            data.here_lng = StateManager.Instance.here_lng;
             data.obj_lat = StateManager.Instance.obj_lat;
             data.obj_lng = StateManager.Instance.obj_lng;
             data.comment = SendingMessage.text;
@@ -129,14 +120,14 @@ public class UIManager : SingletonMonoBehaviour<UIManager> {
         data.comment_id = commentid;
         data.type = type;  
         RequestSender.Instance.SubmitLikeFightSendRequest(data);
-        StateManager .Instance.ObserveEveryValueChanged(x => x.likeFightSendRequestStatus).Subscribe( _ => CompleteSendLikeandGettingComment());
+        //StateManager .Instance.ObserveEveryValueChanged(x => x.likeFightSendRequestStatus).Subscribe( _ => CompleteSendLikeandGettingComment());
     }
 
     public void CompleteSendLikeandGettingComment(){
-        if (StateManager.Instance.likeFightSendRequestStatus == RequestStatus.Success){
+        //if (StateManager.Instance.likeFightSendRequestStatus == RequestStatus.Success){
             Debug.Log("GetComment");
             CreatingMap.Instance.UpDateComment();
-        }
+        //}
     }
 
 
