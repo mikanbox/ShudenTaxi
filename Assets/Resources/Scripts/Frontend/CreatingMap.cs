@@ -54,9 +54,11 @@ public class CreatingMap : MonoBehaviour {
                 int distance = CalculateDistance(StateManager.Instance.commentList[i].comment_lat, StateManager.Instance.commentList[i].comment_lng);
                 GameObject tmp = (GameObject)Instantiate (icon.gameObject, GameObject.Find("CursorCanvas").transform);
                 tmp.GetComponent<RectTransform>().localPosition +=  new Vector3(pos.x, pos.y, 0);
-                tmp.GetComponent<UICusor>().Comment = StateManager.Instance.commentList[i].comment_body;
+                //tmp.GetComponent<UICusor>().Comment = StateManager.Instance.commentList[i].comment_body;
                 tmp.SetActive(true);
             }
+        }else{
+            Debug.Log("Not Comment");
         }
 
 
