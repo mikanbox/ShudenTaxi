@@ -16,7 +16,6 @@ public class MeterPos {
 
 public class CreatingMap : MonoBehaviour {
     private int zoom = 14;          //半径3kmぐらい
-    private Positions GPS = new Positions();
     private MeterPos pos = new MeterPos();
     public Image icon;
     public Image taxi;
@@ -24,14 +23,12 @@ public class CreatingMap : MonoBehaviour {
 
     public static CreatingMap Instance;
     void Awake() {
-        GPS.Longitude = 35.70902;
-        GPS.Latitude = 139.73199;
         Instance = (CreatingMap)this;
-        //GetMap();
+        //GetMap(35.70118,139.71364);
     }
 
-    public void GetMap () {
-        StartCoroutine(GetStreetViewImage(GPS.Longitude, GPS.Latitude, zoom));
+    public void GetMap (double lat,double lng) {
+        StartCoroutine(GetStreetViewImage(lng, lat, zoom));
         //UpDateComment();
     }
 
@@ -64,24 +61,11 @@ public class CreatingMap : MonoBehaviour {
         }else{
             Debug.Log("Not Comment");
         }
-
-
-        // pos = new MeterPos();
-        // int distance = CalculateDistance(139.73372,35.70663);
-        // GameObject tmp = (GameObject)Instantiate (icon.gameObject, GameObject.Find("CursorCanvas").transform);
-        // tmp.GetComponent<RectTransform>().localPosition +=  new Vector3(pos.x, pos.y, 0);
-        // tmp.SetActive(true);
-
-        // pos = new MeterPos();
-        // distance = CalculateDistance(GPS.Latitude, GPS.Longitude);
-        // tmp = (GameObject)Instantiate (icon.gameObject, GameObject.Find("CursorCanvas").transform);
-        // tmp.GetComponent<RectTransform>().localPosition +=  new Vector3(pos.x, pos.y, 0);
-        // tmp.SetActive(true);
-
     }
 
-    private IEnumerator GetStreetViewImage(double latitude, double longitude, double zoom) {
-        string url = "http://maps.googleapis.com/maps/api/staticmap?center=" + latitude + "," + longitude + "&zoom=" + zoom + "&size=" + 400 + "x" + 400 + "";
+    private IEnumerator GetStreetViewImage(double longitude, double latitude, double zoom) {
+        string url = "http://maps.googleapis.com/maps/api/staticmap?center=" + latitude + "," + longitude + "&zoom=" + zoom + "&size=" 
+        + 400 + "x" + 400 + "&markers=size:mid%7Ccolor:red%7C" + latitude + "," + longitude;
         WWW www = new WWW(url);
         yield return www;
         GetComponent<Renderer>().material.mainTexture = www.texture;
@@ -125,8 +109,8 @@ public class CreatingMap : MonoBehaviour {
         double earth_r = 6378.137;
         double laRe, loRe, NSD, EWD, distance;
 
-        laRe = deg2rad(lat - GPS.Latitude);
-        loRe = deg2rad(lng - GPS.Longitude);
+        laRe = deg2rad(lat - UIManager.Instance.here_lat);
+        loRe = deg2rad(lng - UIManager.Instance.here_lng);
 
         NSD = earth_r * laRe;
         EWD = Math.Cos(deg2rad(lat)) * earth_r * loRe;

@@ -13,8 +13,9 @@ public class UIManager : SingletonMonoBehaviour<UIManager> {
     [SerializeField]private GameObject StatusBar;
     [SerializeField]private Text ErrorMes;
 
-    private float here_lat, here_lng;
-    private float test_lat = 139.73099f, test_lng = 35.70902f;
+    public float here_lat, here_lng;
+    //private float test_lat = 35.70902f, test_lng = 139.73099f;
+    private float test_lat = 35.25289f, test_lng = 139.0007f;
 
     private static float interval = 0;
     private UIState uiState = 0;
@@ -69,8 +70,9 @@ public class UIManager : SingletonMonoBehaviour<UIManager> {
         WindowObj[(int)StateManager.Instance.uiState].SetActive(true);
         //Debug.Log("from:" + uiState + "to:" + StateManager.Instance.uiState);
         uiState = StateManager.Instance.uiState;
-        if (uiState == UIState.WriteComment)CreatingMap.Instance.GetMap();
+        if (uiState == UIState.WriteComment)CreatingMap.Instance.GetMap(here_lat,here_lng);
         if (uiState == UIState.Map) {   //マップに遷移した時はコメント読みこみ
+            CreatingMap.Instance.GetMap(here_lat,here_lng);
             CreatingMap.Instance.UpDateComment();
         }
     }
@@ -78,7 +80,7 @@ public class UIManager : SingletonMonoBehaviour<UIManager> {
     public void SubmitMatchingRequest() {
         if (SendingMessage.text != "") {
             MatchingRequest.RequestData data = new MatchingRequest.RequestData();
-            data.userid = StateManager.Instance.userid; //送るメーッ
+            data.userid = StateManager.Instance.userid; //送るid
             data.here_lat = here_lat;
             data.here_lng = here_lng;
             data.obj_lat = StateManager.Instance.obj_lat;
@@ -100,10 +102,13 @@ public class UIManager : SingletonMonoBehaviour<UIManager> {
 
     public void SubmitSettingConfirmRequest() {
         RequestSender.Instance.SubmitAddressToGeometryRequest(Adress.text);
-        StateManager.Instance.ObserveEveryValueChanged(x => x.addressToGeometryRequestStatus).Subscribe( _ => GetAddressLatLng());
+        StateManager .Instance.ObserveEveryValueChanged(x => x.addressToGeometryRequestStatus).Subscribe( _ => CompleteSettingRequest());
+    }
+    public void CompleteSettingRequest(){
+        CreatingMap.Instance.GetMap(StateManager.Instance.ad_lat,StateManager.Instance.ad_lng);
     }
 
-    private void GetAddressLatLng() {
+    public void GetAddressLatLng() {
         if (StateManager.Instance.addressToGeometryRequestStatus == RequestStatus.Success) {
             SettingConfirmRequest.RequestData data = new SettingConfirmRequest.RequestData();
             data.obj_lat = StateManager.Instance.ad_lat;
