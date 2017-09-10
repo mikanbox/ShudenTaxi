@@ -244,7 +244,7 @@ public class ChangeToCommentUIRequest : Request
 	{
 		status = RequestStatus.Sending;
 		status = RequestStatus.Success;
-		SetUIState(UIState.Setting);
+		SetUIState(UIState.WriteComment);
 	}
 
 	//Action
