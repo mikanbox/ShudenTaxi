@@ -21,7 +21,6 @@ public class CreatingMap : MonoBehaviour {
     public Image icon;
     public Image taxi;
 
-    private Positions sm = new Positions();
 
     public static CreatingMap Instance;
     void Awake() {
@@ -37,11 +36,12 @@ public class CreatingMap : MonoBehaviour {
     }
 
     public void UpdateTaxi(float lat, float lng) {
-        int distance = CalculateDistance(10, 10);
+        int distance = CalculateDistance(lat, lng);
         GameObject tmp = (GameObject)Instantiate (taxi.gameObject, GameObject.Find("CursorCanvas").transform);
         tmp.GetComponent<RectTransform>().localPosition +=  new Vector3(pos.x, pos.y, 0);
-        //tmp.GetComponent<Image>().sprite = ;
+        tmp.GetComponent<Image>().sprite = Resources.Load<Sprite>("Sprites/icon/HELP");
         tmp.SetActive(true);
+        Debug.Log("taxiIcon");
     }
 
 
@@ -53,6 +53,8 @@ public class CreatingMap : MonoBehaviour {
         //if (StateManager.Instance.commentList != null)Debug.Log("commentNum"+StateManager.Instance.commentList[3].comment_body);
         if (StateManager.Instance.commentList != null) {
             for (int i = 0; i < StateManager.Instance.commentList.Length; i++) {
+                pos = new MeterPos();
+                //Debug.Log("Comlat"+StateManager.Instance.commentList[i].comment_lat);
                 int distance = CalculateDistance(StateManager.Instance.commentList[i].comment_lat, StateManager.Instance.commentList[i].comment_lng);
                 GameObject tmp = (GameObject)Instantiate (icon.gameObject, GameObject.Find("CursorCanvas").transform);
                 tmp.GetComponent<RectTransform>().localPosition +=  new Vector3(pos.x, pos.y, 0);

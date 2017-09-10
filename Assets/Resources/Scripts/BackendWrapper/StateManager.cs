@@ -22,7 +22,7 @@ public class StateManager : SingletonMonoBehaviour<StateManager>
 	public string taxi_number { get; private set;}
 	public float taxi_lat { get; private set; }
 	public float taxi_lng { get; private set; }
-	public Comment[] commentList { get; private set; }
+	public Comment[] commentList { get; private set;}
 	public UIState uiState { get; private set; }
 	public MatchingState matchingState { get; private set; }
 
@@ -107,13 +107,15 @@ public class StateManager : SingletonMonoBehaviour<StateManager>
 		}
 	}
 }
+
+
 [System.Serializable]
 public class Comment
 {
 	public int id;
 	public int userid;
-	public int comment_lat;
-	public int comment_lng;
+	public float comment_lat;
+	public float comment_lng;
 	public string comment_body;
 	public string comment_imgpath;
 	public string like;

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using UniRx;
+using MiniJSON;
 
 public class UIManager : SingletonMonoBehaviour<UIManager> {
 
@@ -20,14 +21,14 @@ public class UIManager : SingletonMonoBehaviour<UIManager> {
 
     void Update () {
         if (interval < 0) {
-#if UNITY_ANDROID || UNITY_IPHONE
-            StartCoroutine (CreatingMap.Instance.GetGPS());
-            here_lng = Input.location.lastData.longitude;
-            here_lat = Input.location.lastData.latitude;
-#elif UNITY_EDITOR
+// #if UNITY_ANDROID || UNITY_IPHONE
+//             StartCoroutine (CreatingMap.Instance.GetGPS());
+//             here_lng = Input.location.lastData.longitude;
+//             here_lat = Input.location.lastData.latitude;
+// #elif UNITY_EDITOR
             here_lng = test_lng;
             here_lat = test_lat;
-#endif
+// #endif
             interval = 10;
             //Debug.Log("commentLoad");
             //if (StateManager.Instance.commentList != null)Debug.Log("commentNum"+StateManager.Instance.commentList.Length);
@@ -57,20 +58,19 @@ public class UIManager : SingletonMonoBehaviour<UIManager> {
     }
 
     public void LoadComment() {
-        if (StateManager.Instance.matchingRequestStatus == RequestStatus.Failure) {
-            CreatingMap.Instance.UpDateComment();
-            Debug.Log("TriggercommentLoad");
-        }
+        //if (StateManager.Instance.matchingRequestStatus == RequestStatus.Failure) {
+            if (uiState == UIState.Map)CreatingMap.Instance.UpDateComment();
+            //Debug.Log("TriggercommentLoad");
+        //}
     }
 
     private void WindowChange() {
         WindowObj[(int)uiState].SetActive(false);
         WindowObj[(int)StateManager.Instance.uiState].SetActive(true);
-        Debug.Log("from:" + uiState + "to:" + StateManager.Instance.uiState);
+        //Debug.Log("from:" + uiState + "to:" + StateManager.Instance.uiState);
         uiState = StateManager.Instance.uiState;
-
+        if (uiState == UIState.WriteComment)CreatingMap.Instance.GetMap();
         if (uiState == UIState.Map) {   //マップに遷移した時はコメント読みこみ
-            CreatingMap.Instance.GetMap();
             CreatingMap.Instance.UpDateComment();
         }
     }
@@ -78,7 +78,7 @@ public class UIManager : SingletonMonoBehaviour<UIManager> {
     public void SubmitMatchingRequest() {
         if (SendingMessage.text != "") {
             MatchingRequest.RequestData data = new MatchingRequest.RequestData();
-            data.userid = 13;//StateManager.Instance.userid;
+            data.userid = 3;//StateManager.Instance.userid; //送るメーッ
             data.here_lat = here_lat;
             data.here_lng = here_lng;
             data.obj_lat = StateManager.Instance.obj_lat;
@@ -99,38 +99,18 @@ public class UIManager : SingletonMonoBehaviour<UIManager> {
     }
 
     public void SubmitSettingConfirmRequest() {
-        GetLatLngfromString(Adress.text);
+        StartCoroutine(GetLatLngfromString(Adress.text));
         SettingConfirmRequest.RequestData data = new SettingConfirmRequest.RequestData();
         data.obj_lat = 139.73199f;
         data.obj_lng = 35.70902f;
         RequestSender.Instance.SubmitSettingConfirmRequest(data);
     }
 
-
     private IEnumerator GetLatLngfromString(string adress) {
-        string url = "http://maps.google.com/maps/api/geocode/json?address={0}&" + adress;
+        string url = "http://maps.google.com/maps/api/geocode/json?address={0}" + adress +"";
         WWW www = new WWW(url);
         yield return www;
-        Debug.Log(www);
+
     }
-
-    // var url = string.Format("http://maps.google.com/maps/api/geocode/json?address={0}",
-    //                 HttpUtility.UrlEncode("松山市二番町2丁目9-1エフショコラビル2階"));
-
-    // byte[] result;
-    // using (var wc = new WebClient())
-    // {
-    //     result = wc.DownloadData(url);
-    // }
-
-    // var jsonString = Encoding.UTF8.GetString(result);
-
-    // var placeInfo = DynamicJson.Parse(jsonString);
-    // if (placeInfo.status == "OK")
-    // {
-    //     var location = placeInfo.results[0].geometry.location;
-    //     Console.WriteLine(location.lat.ToString());
-    //     Console.WriteLine(location.lng.ToString());
-    // }
 
 }
