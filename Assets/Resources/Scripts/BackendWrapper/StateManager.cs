@@ -76,6 +76,7 @@ public class StateManager : SingletonMonoBehaviour<StateManager>
 			PlayerPrefs.SetFloat(PLAYER_PREFS_OBJ_LAT_KEY, lat);
 			PlayerPrefs.SetFloat(PLAYER_PREFS_OBJ_LNG_KEY, lng);
 		};
+		settingConfirmRequest.SetUIState += (UIState obj) => uiState = obj;
 
 		changeToCommentUIRequest.SetUIState += (UIState obj) => uiState = obj;
 		changeToSettingUIRequest.SetUIState += (UIState obj) => uiState = obj;
