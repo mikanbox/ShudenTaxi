@@ -117,5 +117,15 @@ public class UIManager : SingletonMonoBehaviour<UIManager> {
         }
     }
 
+    public void SubmitCommentLikeFightAdd(){
+        //RequestSender.Instance.SubmitAddressToGeometryRequest(Adress.text);
+        //StateManager .Instance.ObserveEveryValueChanged(x => x.addressToGeometryRequestStatus).Subscribe( _ => CompleteSettingRequest());
+    }
+
+    public void CompleteSendLikeandGettingComment(){
+
+        CreatingMap.Instance.UpDateComment();
+    }
+
 
 }

@@ -93,6 +93,17 @@ public class ItemWindow : MonoBehaviour {
         return ret;
     }
 
+    public bool setColor(string key ,Color color){
+        bool ret=false;
+        if (Oblist.ContainsKey( key )){
+            //Debug.Log("setcallback");
+            ret =true;
+            Oblist[key].GetComponent<Image>().color = color;
+            Oblist[key].SetActive(true);
+        }
+        return ret;
+    }
+
 
     public void Destroythis() {
         userid = -1;

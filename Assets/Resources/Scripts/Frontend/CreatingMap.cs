@@ -58,8 +58,8 @@ public class CreatingMap : MonoBehaviour {
                 tmp.GetComponent<RectTransform>().localPosition +=  new Vector3(pos.x, pos.y, 0);
                 tmp.GetComponent<UICusor>().Comment = StateManager.Instance.commentList[i].comment_body;
                 tmp.GetComponent<UICusor>().userid = StateManager.Instance.commentList[i].userid;
-                tmp.GetComponent<UICusor>().like  =10;
-                tmp.GetComponent<UICusor>().fight =10; 
+                //tmp.GetComponent<UICusor>().like  =StateManager.Instance.commentList[i].like;
+                //tmp.GetComponent<UICusor>().fight =StateManager.Instance.commentList[i].fight; 
                 tmp.SetActive(true);
             }
         }else{
