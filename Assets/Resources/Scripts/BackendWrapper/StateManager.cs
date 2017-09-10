@@ -14,15 +14,18 @@ public class StateManager : SingletonMonoBehaviour<StateManager>
 	private SettingConfirmRequest settingConfirmRequest;
 	private ChangeToSettingUIRequest changeToSettingUIRequest;
 	private ChangeToCommentUIRequest changeToCommentUIRequest;
+	private AddressToGeometryRequest addressToGeometryRequest;
 
 	//以下取得するもの
 	public int userid { get; private set; }
 	public float obj_lat { get; private set; }
 	public float obj_lng { get; private set; }
-	public string taxi_number { get; private set;}
+	public string taxi_number { get; private set; }
 	public float taxi_lat { get; private set; }
 	public float taxi_lng { get; private set; }
-	public Comment[] commentList { get; private set;}
+	public float ad_lat { get; private set;}
+	public float ad_lng { get; private set;}
+	public Comment[] commentList { get; private set; }
 	public UIState uiState { get; private set; }
 	public MatchingState matchingState { get; private set; }
 
@@ -31,6 +34,7 @@ public class StateManager : SingletonMonoBehaviour<StateManager>
 	public RequestStatus settingConfirmRequestStatus { get { return settingConfirmRequest.status; } }
 	public RequestStatus changeToSettingUIRequestStatus { get { return changeToSettingUIRequest.status;} }
 	public RequestStatus changeToCommentUIRequestStatus { get { return changeToCommentUIRequest.status;} }
+	public RequestStatus addressToGeometryRequestStatus { get { return addressToGeometryRequest.status;} }
 
 	// Use this for initialization
 	protected override void Awake()
@@ -58,6 +62,7 @@ public class StateManager : SingletonMonoBehaviour<StateManager>
 		settingConfirmRequest = new SettingConfirmRequest();
 		changeToSettingUIRequest = new ChangeToSettingUIRequest();
 		changeToCommentUIRequest = new ChangeToCommentUIRequest();
+		addressToGeometryRequest = new AddressToGeometryRequest();
 	}
 
 	private void SetRequestEvent() {
@@ -91,6 +96,12 @@ public class StateManager : SingletonMonoBehaviour<StateManager>
 		MatchingChecker.Instance.SetMatchingState += (state) => matchingState = state;
 
 		TaxiCommingChecker.Instance.SetMatchingState += (state) => matchingState = state;
+
+		addressToGeometryRequest.SetAddressPosition += (lat, lng) =>
+		{
+			ad_lat = lat;
+			ad_lng = lng;
+		};
 	}
 
 	private void LoadData()

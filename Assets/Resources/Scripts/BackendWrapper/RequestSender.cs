@@ -9,6 +9,7 @@ public class RequestSender : SingletonMonoBehaviour<RequestSender> {
 	public System.Action<SettingConfirmRequest.RequestData> SubmitSettingConfirmRequest;
 	public System.Action SubmitChangeToSettingUIRequest;
 	public System.Action SubmitChangeToCommentUIRequest;
+	public System.Action<string> SubmitAddressToGeometryRequest;
 }
 
 
