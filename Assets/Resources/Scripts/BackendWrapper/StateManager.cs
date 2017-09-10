@@ -114,7 +114,7 @@ public class Comment
 	public int userid;
 	public int comment_lat;
 	public int comment_lng;
-	public int comment_body;
+	public string comment_body;
 	public string comment_imgpath;
 	public string like;
 	public string fight;
