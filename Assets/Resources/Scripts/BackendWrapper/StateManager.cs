@@ -16,14 +16,12 @@ public class StateManager : SingletonMonoBehaviour<StateManager>
 	private ChangeToCommentUIRequest changeToCommentUIRequest;
 
 	//以下取得するもの
-	public int? userid { get; private set; }
-	public float? here_lat { get; private set; }
-	public float? here_lng { get; private set; }
-	public float? obj_lat { get; private set; }
-	public float? obj_lng { get; private set; }
+	public int userid { get; private set; }
+	public float obj_lat { get; private set; }
+	public float obj_lng { get; private set; }
 	public string taxi_number { get; private set;}
-	public float? taxi_lat { get; private set; }
-	public float? taxi_lng { get; private set; }
+	public float taxi_lat { get; private set; }
+	public float taxi_lng { get; private set; }
 	public Comment[] commentList { get; private set; }
 	public UIState uiState { get; private set; }
 	public MatchingState matchingState { get; private set; }
@@ -68,13 +66,30 @@ public class StateManager : SingletonMonoBehaviour<StateManager>
 			PlayerPrefs.SetInt(PLAYER_PREFS_USER_ID_KEY, id);
 			PlayerPrefs.Save();
 		};
+
+		matchingRequest.SetComments += (comments) => commentList = comments;
+		matchingRequest.SetUIState += (UIState obj) => uiState = obj;
+		matchingRequest.SetMatchingState += (MatchingState obj) => matchingState = obj;
+
 		settingConfirmRequest.SetObjPostiion += (lat, lng) => { 
 			obj_lat = lat; obj_lng = lng;
 			PlayerPrefs.SetFloat(PLAYER_PREFS_OBJ_LAT_KEY, lat);
 			PlayerPrefs.SetFloat(PLAYER_PREFS_OBJ_LNG_KEY, lng);
 		};
+
 		changeToCommentUIRequest.SetUIState += (UIState obj) => uiState = obj;
 		changeToSettingUIRequest.SetUIState += (UIState obj) => uiState = obj;
+
+		MatchingChecker.Instance.SetTaxiInfo += (number, lat, lng) =>
+		{
+			taxi_number = number;
+			taxi_lat = lat;
+			taxi_lng = lng;
+		};
+
+		MatchingChecker.Instance.SetMatchingState += (state) => matchingState = state;
+
+		TaxiCommingChecker.Instance.SetMatchingState += (state) => matchingState = state;
 	}
 
 	private void LoadData()
@@ -95,9 +110,15 @@ public class StateManager : SingletonMonoBehaviour<StateManager>
 public class Comment
 {
 	public int id;
-	public string content;
-	public float lat;
-	public float lng;
+	public int userid;
+	public int comment_lat;
+	public int comment_lng;
+	public int comment_body;
+	public string comment_imgpath;
+	public string like;
+	public string fight;
+	public string created_at;
+	public string updated_at;
 }
 
 public enum UIState
@@ -111,6 +132,7 @@ public enum UIState
 public enum MatchingState
 {
 	BeforeMatching,
+	CannotSendMatchingRequest,
 	Matching,
 	Matched,
 	TaxiCome,
