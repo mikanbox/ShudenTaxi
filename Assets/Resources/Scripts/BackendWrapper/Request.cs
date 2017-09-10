@@ -176,6 +176,7 @@ public class MatchingRequest : Request
 						{
 							status = RequestStatus.Success;
 							SetMatchingState(MatchingState.Matching);
+							SetComments(answer.comments);
 							SetUIState(UIState.Map);
 						}
 					}
