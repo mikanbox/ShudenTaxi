@@ -32,10 +32,6 @@ public class CreatingMap : MonoBehaviour {
     }
 
     public void GetMap () {
-        //StartCoroutine (GetGPS());
-        //GPS.Longitude = Input.location.lastData.longitude;
-        //GPS.Latitude = Input.location.lastData.latitude;
-
         StartCoroutine(GetStreetViewImage(GPS.Longitude, GPS.Latitude, zoom));
         UpDateComment();
     }
