@@ -7,6 +7,7 @@ public class StateManager : SingletonMonoBehaviour<StateManager>
 	private const string PLAYER_PREFS_USER_ID_KEY = "userid";
 	private const string PLAYER_PREFS_OBJ_LAT_KEY = "obj_lat";
 	private const string PLAYER_PREFS_OBJ_LNG_KEY = "obj_lng";
+	private const string PLAYER_PREFS_NOGASHITIMES_KEY = "nogashitimes";
 
 	//リクエストデータは取得不要だが、どこかでインスタンスを作らないといけないので、ここで保持
 	private MakeIDRequest makeIDRequest;
@@ -15,9 +16,11 @@ public class StateManager : SingletonMonoBehaviour<StateManager>
 	private ChangeToSettingUIRequest changeToSettingUIRequest;
 	private ChangeToCommentUIRequest changeToCommentUIRequest;
 	private AddressToGeometryRequest addressToGeometryRequest;
+	private CountNogashiTimesRequest countNogashiTimesRequest;
 
 	//以下取得するもの
 	public int userid { get; private set; }
+	public int nogashiTimes { get; private set;}
 	public float obj_lat { get; private set; }
 	public float obj_lng { get; private set; }
 	public string taxi_number { get; private set; }
@@ -35,6 +38,7 @@ public class StateManager : SingletonMonoBehaviour<StateManager>
 	public RequestStatus changeToSettingUIRequestStatus { get { return changeToSettingUIRequest.status;} }
 	public RequestStatus changeToCommentUIRequestStatus { get { return changeToCommentUIRequest.status;} }
 	public RequestStatus addressToGeometryRequestStatus { get { return addressToGeometryRequest.status;} }
+	public RequestStatus countNogashiTImesRequestStatus { get { return countNogashiTimesRequest.status;} }
 
 	// Use this for initialization
 	protected override void Awake()
@@ -63,6 +67,7 @@ public class StateManager : SingletonMonoBehaviour<StateManager>
 		changeToSettingUIRequest = new ChangeToSettingUIRequest();
 		changeToCommentUIRequest = new ChangeToCommentUIRequest();
 		addressToGeometryRequest = new AddressToGeometryRequest();
+		countNogashiTimesRequest = new CountNogashiTimesRequest();
 	}
 
 	private void SetRequestEvent() {
@@ -102,6 +107,13 @@ public class StateManager : SingletonMonoBehaviour<StateManager>
 			ad_lat = lat;
 			ad_lng = lng;
 		};
+
+		countNogashiTimesRequest.SetNogashiTimes += (times) => {
+			nogashiTimes = times;
+			PlayerPrefs.SetInt(PLAYER_PREFS_NOGASHITIMES_KEY, times);
+		};
+
+		countNogashiTimesRequest.SetUIState += (state) => uiState = state;
 	}
 
 	private void LoadData()
@@ -116,6 +128,13 @@ public class StateManager : SingletonMonoBehaviour<StateManager>
 			obj_lat = PlayerPrefs.GetFloat(PLAYER_PREFS_OBJ_LAT_KEY);
 			obj_lng = PlayerPrefs.GetFloat(PLAYER_PREFS_OBJ_LNG_KEY);
 		}
+
+		bool hastimes = PlayerPrefs.HasKey(PLAYER_PREFS_NOGASHITIMES_KEY);
+		if (hastimes)
+		{
+			nogashiTimes = PlayerPrefs.GetInt(PLAYER_PREFS_NOGASHITIMES_KEY);
+		}
+			
 	}
 }
 

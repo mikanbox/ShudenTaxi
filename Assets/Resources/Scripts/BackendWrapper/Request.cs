@@ -274,7 +274,8 @@ public class AddressToGeometryRequest : Request
 	}
 
 	[System.Serializable]
-	public class GoogleAPIResult {
+	public class GoogleAPIResult
+	{
 		public AddressComponent[] address_components;
 		public string formatted_address;
 		public Geometry geometry;
@@ -284,27 +285,31 @@ public class AddressToGeometryRequest : Request
 	}
 
 	[System.Serializable]
-	public class AddressComponent {
+	public class AddressComponent
+	{
 		public string long_name;
 		public string short_name;
 		public string[] types;
 	}
 
 	[System.Serializable]
-	public class Geometry {
+	public class Geometry
+	{
 		public Location location;
 		public string location_type;
-		public ViewPort viewPort; 
+		public ViewPort viewPort;
 	}
 
 	[System.Serializable]
-	public class Location {
+	public class Location
+	{
 		public float lat;
 		public float lng;
 	}
 
 	[System.Serializable]
-	public class ViewPort {
+	public class ViewPort
+	{
 		public Location northeast;
 		public Location southwest;
 	}
@@ -343,7 +348,7 @@ public class AddressToGeometryRequest : Request
 						string rawJson = request.downloadHandler.text;
 						RequestAnswerData answer = JsonUtility.FromJson<RequestAnswerData>(rawJson);
 						Debug.Log(answer.results[0].geometry.location.lat);
-                        SetAddressPosition(answer.results[0].geometry.location.lat,answer.results[0].geometry.location.lng);
+						SetAddressPosition(answer.results[0].geometry.location.lat, answer.results[0].geometry.location.lng);
 						status = RequestStatus.Success;
 					}
 					else
@@ -359,4 +364,25 @@ public class AddressToGeometryRequest : Request
 
 	//Action
 	public System.Action<float, float> SetAddressPosition;
+}
+
+public class CountNogashiTimesRequest : Request { 
+
+	public CountNogashiTimesRequest()
+	{
+		RequestSender.Instance.SubmitCountNogashiTimesRequest += OnSendRequest;
+	}
+
+	public void OnSendRequest()
+	{
+		status = RequestStatus.Sending;
+		SetNogashiTimes(StateManager.Instance.nogashiTimes + 1);
+		SetUIState(UIState.Title);
+		status = RequestStatus.Success;
+	}
+
+	//Action
+	public System.Action<int> SetNogashiTimes;
+	public System.Action<UIState> SetUIState;
+
 }
