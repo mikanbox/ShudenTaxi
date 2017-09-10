@@ -33,7 +33,7 @@ public class CreatingMap : MonoBehaviour {
 
     public void GetMap () {
         StartCoroutine(GetStreetViewImage(GPS.Longitude, GPS.Latitude, zoom));
-        UpDateComment();
+        //UpDateComment();
     }
 
     public void UpdateTaxi(float lat, float lng) {
@@ -45,10 +45,11 @@ public class CreatingMap : MonoBehaviour {
     }
 
 
-    private void UpDateComment() {
+    public void UpDateComment() {
         foreach ( Transform n in icon.transform.parent ) { //子オブジェクトを全て破壊
             if (n.gameObject != icon.gameObject && n.gameObject != taxi.gameObject)GameObject.Destroy(n.gameObject);
         }
+
         if (StateManager.Instance.commentList != null) {
             for (int i = 0; i < StateManager.Instance.commentList.Length; i++) {
                 int distance = CalculateDistance(StateManager.Instance.commentList[i].comment_lat, StateManager.Instance.commentList[i].comment_lng);
