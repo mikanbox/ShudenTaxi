@@ -4,6 +4,7 @@ using System.Threading;
 using UnityEngine;
 using UnityEngine.Networking;
 using UniRx;
+using System.Linq;
 
 public enum RequestStatus
 {
@@ -274,7 +275,8 @@ public class AddressToGeometryRequest : Request
 	}
 
 	[System.Serializable]
-	public class GoogleAPIResult {
+	public class GoogleAPIResult
+	{
 		public AddressComponent[] address_components;
 		public string formatted_address;
 		public Geometry geometry;
@@ -284,27 +286,31 @@ public class AddressToGeometryRequest : Request
 	}
 
 	[System.Serializable]
-	public class AddressComponent {
+	public class AddressComponent
+	{
 		public string long_name;
 		public string short_name;
 		public string[] types;
 	}
 
 	[System.Serializable]
-	public class Geometry {
+	public class Geometry
+	{
 		public Location location;
 		public string location_type;
-		public ViewPort viewPort; 
+		public ViewPort viewPort;
 	}
 
 	[System.Serializable]
-	public class Location {
+	public class Location
+	{
 		public float lat;
 		public float lng;
 	}
 
 	[System.Serializable]
-	public class ViewPort {
+	public class ViewPort
+	{
 		public Location northeast;
 		public Location southwest;
 	}
@@ -343,12 +349,12 @@ public class AddressToGeometryRequest : Request
 						string rawJson = request.downloadHandler.text;
 						RequestAnswerData answer = JsonUtility.FromJson<RequestAnswerData>(rawJson);
 						Debug.Log(answer.results[0].geometry.location.lat);
-                        SetAddressPosition(answer.results[0].geometry.location.lat,answer.results[0].geometry.location.lng);
+						SetAddressPosition(answer.results[0].geometry.location.lat, answer.results[0].geometry.location.lng);
 						status = RequestStatus.Success;
 					}
 					else
 					{
-						Debug.LogError("MakeUserIDRequest:API doesn't return responseCode 200");
+						Debug.LogError("AddressToGeometryRequest:API doesn't return responseCode 200");
 						status = RequestStatus.Failure;
 					}
 				}
@@ -360,3 +366,152 @@ public class AddressToGeometryRequest : Request
 	//Action
 	public System.Action<float, float> SetAddressPosition;
 }
+
+public class CountNogashiTimesRequest : Request
+{
+
+	public CountNogashiTimesRequest()
+	{
+		RequestSender.Instance.SubmitCountNogashiTimesRequest += OnSendRequest;
+	}
+
+	public void OnSendRequest()
+	{
+		status = RequestStatus.Sending;
+		SetNogashiTimes(StateManager.Instance.nogashiTimes + 1);
+		SetUIState(UIState.Title);
+		status = RequestStatus.Success;
+	}
+
+	//Action
+	public System.Action<int> SetNogashiTimes;
+	public System.Action<UIState> SetUIState;
+
+}
+
+public class LikeFightSendRequest : Request
+{
+	public static readonly string REQUEST_URL = BackendWrapperConf.APIURL + "/feeling/vote";
+	private UnityWebRequest request;
+	private AsyncOperation webRequestStatus;
+	private System.IDisposable requestEvent;
+	private System.IDisposable matchingRequester;
+
+	public LikeFightSendRequest()
+	{
+		RequestSender.Instance.SubmitLikeFightSendRequest += OnSendRequest;
+	}
+
+	public class RequestData
+	{
+		public int comment_id;
+		public CommentType type;
+	}
+
+	public enum CommentType
+	{
+		like,
+		fight
+	}
+
+	public class AnswerData
+	{
+		public bool result;
+		public int comment_id;
+		public float comment_lat;
+		public float comment_lng;
+		public string comment_body;
+		public int comment_like;
+		public int comment_fight;
+	}
+
+	public System.Action<Comment[]> SetComments;
+	public System.Action<MatchingState> SetMatchingState;
+	public System.Action<UIState> SetUIState;
+
+	private void OnSendRequest(RequestData data)
+	{
+		//前回のリクエストをが処理中の場合エラー
+		if (status == RequestStatus.Sending)
+		{
+			Debug.LogWarning("you cannnot sending request many times.Please wait previous request end");
+			return;
+		}
+
+		WWWForm postData = new WWWForm();
+		postData.AddField("comment_id", data.comment_id);
+		postData.AddField("type", data.type.ToString());
+
+		//リクエスト設定し、飛ばす。
+		request = UnityWebRequest.Post(REQUEST_URL, postData);
+		webRequestStatus = request.Send();
+		status = RequestStatus.Sending;
+
+		//リクエストの結果を受け取る。
+		requestEvent = this.ObserveEveryValueChanged(x => x.webRequestStatus.isDone)
+			.Where(isDone => isDone == true)
+			.Subscribe(isDone =>
+			{
+				if (request.isError)
+				{
+					Debug.LogError(request.error);
+					status = RequestStatus.Failure;
+				}
+				else
+				{
+					if (request.responseCode == 200)
+					{
+						string rawJson = request.downloadHandler.text;
+						var answer = JsonUtility.FromJson<AnswerData>(rawJson);
+						if (!answer.result)
+						{
+							Debug.LogError("APIError: cannnot vote like or fight");
+							status = RequestStatus.Failure;
+						}
+						else
+						{
+							status = RequestStatus.Success;
+							{
+								var afterComments = StateManager.Instance.commentList.ToArray();
+								if (afterComments.Where(comment => comment.id == answer.comment_id).Count() == 0)
+								{
+									var comment = new Comment();
+									comment.id = answer.comment_id;
+									comment.like = answer.comment_like;
+									comment.fight = answer.comment_fight;
+									comment.comment_lat = answer.comment_lat;
+									comment.comment_lng = answer.comment_lng;
+									comment.comment_body = answer.comment_body;
+									var afterCommentsToList = afterComments.ToList();
+									afterCommentsToList.Add(comment);
+									afterComments = afterCommentsToList.ToArray();
+								}
+								else
+								{
+									for (int i = 0; i < afterComments.Length; i++)
+									{
+										if (afterComments[i].id == answer.comment_id)
+										{
+											afterComments[i].like = answer.comment_like;
+											afterComments[i].fight = answer.comment_fight;
+										}
+									}
+								}
+								SetComments(afterComments);
+							}
+						}
+					}
+					else
+					{
+						Debug.LogError("LikeFightSendRequest:API doesn't return responseCode 200");
+						status = RequestStatus.Failure;
+					}
+
+					if (requestEvent != null)
+						requestEvent.Dispose();
+				}
+			});
+	}
+}
+
+
