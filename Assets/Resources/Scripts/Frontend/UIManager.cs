@@ -59,8 +59,8 @@ public class UIManager : SingletonMonoBehaviour<UIManager> {
 
     public void LoadComment() {
         //if (StateManager.Instance.matchingRequestStatus == RequestStatus.Failure) {
-            if (uiState == UIState.Map)CreatingMap.Instance.UpDateComment();
-            //Debug.Log("TriggercommentLoad");
+        if (uiState == UIState.Map)CreatingMap.Instance.UpDateComment();
+        //Debug.Log("TriggercommentLoad");
         //}
     }
 
@@ -78,7 +78,7 @@ public class UIManager : SingletonMonoBehaviour<UIManager> {
     public void SubmitMatchingRequest() {
         if (SendingMessage.text != "") {
             MatchingRequest.RequestData data = new MatchingRequest.RequestData();
-            data.userid = 3;//StateManager.Instance.userid; //送るメーッ
+            data.userid = StateManager.Instance.userid; //送るメーッ
             data.here_lat = here_lat;
             data.here_lng = here_lng;
             data.obj_lat = StateManager.Instance.obj_lat;
@@ -99,18 +99,19 @@ public class UIManager : SingletonMonoBehaviour<UIManager> {
     }
 
     public void SubmitSettingConfirmRequest() {
-        StartCoroutine(GetLatLngfromString(Adress.text));
-        SettingConfirmRequest.RequestData data = new SettingConfirmRequest.RequestData();
-        data.obj_lat = 139.73199f;
-        data.obj_lng = 35.70902f;
-        RequestSender.Instance.SubmitSettingConfirmRequest(data);
+        RequestSender.Instance.SubmitAddressToGeometryRequest(Adress.text);
+        StateManager.Instance.ObserveEveryValueChanged(x => x.addressToGeometryRequestStatus).Subscribe( _ => GetAddressLatLng());
     }
 
-    private IEnumerator GetLatLngfromString(string adress) {
-        string url = "http://maps.google.com/maps/api/geocode/json?address={0}" + adress +"";
-        WWW www = new WWW(url);
-        yield return www;
-
+    private void GetAddressLatLng() {
+        if (StateManager.Instance.addressToGeometryRequestStatus == RequestStatus.Success) {
+            SettingConfirmRequest.RequestData data = new SettingConfirmRequest.RequestData();
+            data.obj_lat = StateManager.Instance.ad_lat;
+            data.obj_lng = StateManager.Instance.ad_lng;
+            RequestSender.Instance.SubmitSettingConfirmRequest(data);
+            Debug.Log("SetObj");
+        }
     }
+
 
 }
