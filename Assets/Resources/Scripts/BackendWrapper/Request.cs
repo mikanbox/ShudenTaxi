@@ -60,7 +60,7 @@ public class MakeIDRequest : Request
 			.Where(isDone => isDone == true)
 			.Subscribe(isDone =>
 			{
-				if (request.isError)
+				if (request.isNetworkError)
 				{
 					Debug.Log(request.url);
 					Debug.LogError(request.error);
@@ -154,7 +154,7 @@ public class MatchingRequest : Request
 			.Where(isDone => isDone == true)
 			.Subscribe(isDone =>
 			{
-				if (request.isError)
+				if (request.isNetworkError)
 				{
 					Debug.Log(request.url);
 					Debug.LogError(request.error);

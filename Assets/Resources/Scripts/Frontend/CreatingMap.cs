@@ -28,7 +28,7 @@ public class CreatingMap : MonoBehaviour {
         GPS.Longitude = 35.70902;
         GPS.Latitude = 139.73199;
         Instance = (CreatingMap)this;
-        GetMap();
+        //GetMap();
     }
 
     public void GetMap () {
@@ -42,7 +42,7 @@ public class CreatingMap : MonoBehaviour {
 
     public void UpdateTaxi() {
         Positions compos = new Positions();
-        int distance = CalculateDistance(10,10);
+        int distance = CalculateDistance(10, 10);
         GameObject tmp = (GameObject)Instantiate (taxi.gameObject, GameObject.Find("CursorCanvas").transform);
         tmp.GetComponent<RectTransform>().localPosition +=  new Vector3(pos.x, pos.y, 0);
         //tmp.GetComponent<Image>().sprite = ;
@@ -54,25 +54,29 @@ public class CreatingMap : MonoBehaviour {
         foreach ( Transform n in icon.transform.parent ) { //子オブジェクトを全て破壊
             if (n.gameObject != icon.gameObject && n.gameObject != taxi.gameObject)GameObject.Destroy(n.gameObject);
         }
-        // for (int i = 0; i < StateManager.Instance.commentList.Length; i++) {
-        //     int distance = CalculateDistance(StateManager.Instance.commentList[i].lat, StateManager.Instance.commentList[i].lng);
-        //     GameObject tmp = (GameObject)Instantiate (icon.gameObject, GameObject.Find("CursorCanvas").transform);
-        //     tmp.GetComponent<RectTransform>().localPosition +=  new Vector3(pos.x, pos.y, 0);
-        //     tmp.SetActive(true);
-        // }
+        for (int i = 0; i < StateManager.Instance.commentList.Length; i++) {
+            int distance = CalculateDistance(StateManager.Instance.commentList[i].comment_lat, StateManager.Instance.commentList[i].comment_lng);
+            if (distance < 1000) {
+                GameObject tmp = (GameObject)Instantiate (icon.gameObject, GameObject.Find("CursorCanvas").transform);
+                tmp.GetComponent<RectTransform>().localPosition +=  new Vector3(pos.x, pos.y, 0);
+                tmp.SetActive(true);
+            }
+
+        }
 
 
-        pos = new MeterPos();
-        int distance = CalculateDistance(139.73372,35.70663);
-        GameObject tmp = (GameObject)Instantiate (icon.gameObject, GameObject.Find("CursorCanvas").transform);
-        tmp.GetComponent<RectTransform>().localPosition +=  new Vector3(pos.x, pos.y, 0);
-        tmp.SetActive(true);
+        // pos = new MeterPos();
+        // int distance = CalculateDistance(139.73372,35.70663);
+        // GameObject tmp = (GameObject)Instantiate (icon.gameObject, GameObject.Find("CursorCanvas").transform);
+        // tmp.GetComponent<RectTransform>().localPosition +=  new Vector3(pos.x, pos.y, 0);
+        // tmp.SetActive(true);
 
-        pos = new MeterPos();
-        distance = CalculateDistance(GPS.Latitude, GPS.Longitude);
-        tmp = (GameObject)Instantiate (icon.gameObject, GameObject.Find("CursorCanvas").transform);
-        tmp.GetComponent<RectTransform>().localPosition +=  new Vector3(pos.x, pos.y, 0);
-        tmp.SetActive(true);
+        // pos = new MeterPos();
+        // distance = CalculateDistance(GPS.Latitude, GPS.Longitude);
+        // tmp = (GameObject)Instantiate (icon.gameObject, GameObject.Find("CursorCanvas").transform);
+        // tmp.GetComponent<RectTransform>().localPosition +=  new Vector3(pos.x, pos.y, 0);
+        // tmp.SetActive(true);
+
     }
 
     private IEnumerator GetStreetViewImage(double latitude, double longitude, double zoom) {
@@ -82,7 +86,7 @@ public class CreatingMap : MonoBehaviour {
         GetComponent<Renderer>().material.mainTexture = www.texture;
     }
 
-    private IEnumerator GetGPS() {
+    public IEnumerator GetGPS() {
         if (!Input.location.isEnabledByUser) {
             yield break;
         }
@@ -121,15 +125,15 @@ public class CreatingMap : MonoBehaviour {
         double earth_r = 6378.137;
         double laRe, loRe, NSD, EWD, distance;
 
-        laRe = deg2rad(lat- GPS.Latitude);
+        laRe = deg2rad(lat - GPS.Latitude);
         loRe = deg2rad(lng - GPS.Longitude);
 
         NSD = earth_r * laRe;
         EWD = Math.Cos(deg2rad(lat)) * earth_r * loRe;
         distance = Math.Sqrt(Math.Pow(NSD, 2) + Math.Pow(EWD, 2));
 
-        pos.x = (float)(NSD/10000*(System.Math.Pow(2f, zoom)) ) ;
-        pos.y -= (float)(EWD/10000*(System.Math.Pow(2f, zoom)) );
+        pos.x = (float)(NSD / 10000 * (System.Math.Pow(2f, zoom)) ) ;
+        pos.y -= (float)(EWD / 10000 * (System.Math.Pow(2f, zoom)) );
 
         return (int)Math.Round(distance);
     }

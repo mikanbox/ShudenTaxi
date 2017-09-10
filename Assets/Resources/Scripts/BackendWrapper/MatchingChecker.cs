@@ -62,7 +62,7 @@ public class MatchingChecker : SingletonMonoBehaviour<MatchingChecker>
 				.Where(isDone => isDone == true)
 				.Subscribe(isDone =>
 				{
-					if (request.isError)
+					if (request.isNetworkError)
 					{
 						Debug.LogError(request.error);
 					}
