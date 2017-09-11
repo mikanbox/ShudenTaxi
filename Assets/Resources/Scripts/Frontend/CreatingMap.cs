@@ -29,7 +29,7 @@ public class CreatingMap : MonoBehaviour {
 
     public void UpdateTaxi(float lat, float lng) {
         int distance = CalculateDistance(lat, lng);
-        GameObject tmp = (GameObject)Instantiate (taxi.gameObject, GameObject.Find("CursorCanvas").transform);
+        GameObject tmp = (GameObject)Instantiate (taxi.gameObject, GameObject.Find("TaxiCanvas").transform);
         tmp.GetComponent<RectTransform>().localPosition +=  new Vector3(pos.x, pos.y, 0);
         //tmp.GetComponent<Image>().sprite = Resources.Load<Sprite>("Sprites/icon/HELP");
         tmp.SetActive(true);
@@ -46,7 +46,7 @@ public class CreatingMap : MonoBehaviour {
             for (int i = 0; i < StateManager.Instance.commentList.Length; i++) {
                 bool isexisted = false;
                 foreach ( Transform n in icon.transform.parent ) {
-                    if (n.gameObject != icon.gameObject && n.gameObject != taxi.gameObject) {
+                    if (n.gameObject != icon.gameObject) {
                         if (n.GetComponent<UICusor>().id == StateManager.Instance.commentList[i].id ) {
                             n.GetComponent<UICusor>().like  = StateManager.Instance.commentList[i].like;
                             n.GetComponent<UICusor>().fight = StateManager.Instance.commentList[i].fight;
@@ -71,6 +71,7 @@ public class CreatingMap : MonoBehaviour {
     }
 
     private IEnumerator GetStreetViewImage(double longitude, double latitude, double zoom) {
+        //Debug.Log("texture");
         string url = "http://maps.googleapis.com/maps/api/staticmap?center=" + latitude + "," + longitude + "&zoom=" + zoom + "&size="
                      + 400 + "x" + 400 + "&markers=size:mid%7Ccolor:red%7C" + latitude + "," + longitude;
         WWW www = new WWW(url);
@@ -94,8 +95,8 @@ public class CreatingMap : MonoBehaviour {
         EWD = Math.Cos(deg2rad(lat)) * earth_r * loRe;
         distance = Math.Sqrt(Math.Pow(NSD, 2) + Math.Pow(EWD, 2));
 
-        pos.x = (float)(NSD / 10000 * (System.Math.Pow(2f, zoom)) ) ;
-        pos.y -= (float)(EWD / 10000 * (System.Math.Pow(2f, zoom)) );
+        pos.y = (float)(NSD  * (System.Math.Pow(2f, zoom)) ) / 5000f ;
+        pos.x = (float)(EWD  * (System.Math.Pow(2f, zoom)) ) / 5000f;
 
         return (int)Math.Round(distance);
     }

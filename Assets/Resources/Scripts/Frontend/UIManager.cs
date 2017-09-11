@@ -21,7 +21,6 @@ public class UIManager : SingletonMonoBehaviour<UIManager> {
     void Update () {
         if (interval < 0) {
             CompleteSendLikeandGettingComment();
-
             interval = 5f;
         }
         interval -= Time.deltaTime;
@@ -44,20 +43,18 @@ public class UIManager : SingletonMonoBehaviour<UIManager> {
     public void StatusBarManager() {//MatchingStateが変わった時よばれる
         StatusBar.SetActive((StateManager.Instance.matchingState == MatchingState.Matching));
         if (StateManager.Instance.matchingState == MatchingState.Matched) {
-            CreateMessWindow("マッチング過料", "相乗り相手が見つかったのでタクシーを呼びました。地図の赤い点に移動してタクシーを待ちましょう");
+            CreateMessWindow("マッチング完了", "相乗り相手が見つかったのでタクシーを呼びました。地図の赤い点に移動してタクシーを待ちましょう");
             CreatingMap.Instance.UpdateTaxi(StateManager.Instance.taxi_lat, StateManager.Instance.taxi_lng);
         }
         if (StateManager.Instance.matchingState == MatchingState.TaxiCome) {
             WindowObj[2].SetActive(false);
             WindowObj[4].SetActive(true);
+            RequestSender.Instance.SubmitCountNogashiTimesRequest();
         }
     }
 
     public void LoadComment() {
-        //if (StateManager.Instance.matchingRequestStatus == RequestStatus.Failure) {
         if (uiState == UIState.Map)CreatingMap.Instance.UpDateComment();
-        //Debug.Log("TriggercommentLoad");
-        //}
     }
 
     private void WindowChange() {
@@ -91,7 +88,10 @@ public class UIManager : SingletonMonoBehaviour<UIManager> {
         RequestSender.Instance.SubmitChangeToCommentUIRequest();
     }
 
+
+
     public void SubmitChangeToSettingUIRequest() {
+
         RequestSender.Instance.SubmitChangeToSettingUIRequest();
     }
 
@@ -104,6 +104,8 @@ public class UIManager : SingletonMonoBehaviour<UIManager> {
                 CreateMessWindow("", "住所を入力してください");
             }
     }
+
+
     public void CompleteSettingRequest() {
         CreatingMap.Instance.GetMap(StateManager.Instance.ad_lat, StateManager.Instance.ad_lng);
     }
@@ -129,10 +131,7 @@ public class UIManager : SingletonMonoBehaviour<UIManager> {
     }
 
     public void CompleteSendLikeandGettingComment() {
-        //if (StateManager.Instance.likeFightSendRequestStatus == RequestStatus.Success){
-        //Debug.Log("GetComment");
         CreatingMap.Instance.UpDateComment();
-        //}
     }
 
     private void CreateMessWindow(string title, string mess) {
