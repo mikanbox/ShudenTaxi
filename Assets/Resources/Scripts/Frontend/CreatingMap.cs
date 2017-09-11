@@ -87,8 +87,8 @@ public class CreatingMap : MonoBehaviour {
         double earth_r = 6378.137;
         double laRe, loRe, NSD, EWD, distance;
 
-        laRe = deg2rad(lat - UIManager.Instance.here_lat);
-        loRe = deg2rad(lng - UIManager.Instance.here_lng);
+        laRe = deg2rad(lat - StateManager.Instance.here_lat);
+        loRe = deg2rad(lng - StateManager.Instance.here_lng);
 
         NSD = earth_r * laRe;
         EWD = Math.Cos(deg2rad(lat)) * earth_r * loRe;

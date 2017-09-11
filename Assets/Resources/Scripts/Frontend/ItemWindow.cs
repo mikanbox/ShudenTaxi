@@ -42,6 +42,7 @@ public class ItemWindow : MonoBehaviour {
         Tlist.Add("exp1num",exp1num);
         Tlist.Add("exp2",exp2);
         Tlist.Add("exp2num",exp2num);
+        Tlist.Add("title",title);
 
 
         Oblist.Add("exp",exp.gameObject);
@@ -53,6 +54,7 @@ public class ItemWindow : MonoBehaviour {
         Oblist.Add("icon2",icon2.gameObject);
         Oblist.Add("button1",button1.gameObject);
         Oblist.Add("button2",button2.gameObject);
+        Oblist.Add("title",title.gameObject);
 
 	}
 	

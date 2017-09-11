@@ -14,9 +14,6 @@ public class UIManager : SingletonMonoBehaviour<UIManager> {
     [SerializeField]private Text ErrorMes;
     [SerializeField]private Text nogashiTimesMess;
 
-    public float here_lat, here_lng;
-    //private float test_lat = 35.70902f, test_lng = 139.73099f;
-    private float test_lat = 35.25059f, test_lng = 139.0007f;
 
     private static float interval = 0;
     private UIState uiState = 0;
@@ -37,16 +34,17 @@ public class UIManager : SingletonMonoBehaviour<UIManager> {
         StateManager.Instance.ObserveEveryValueChanged(x => x.matchingState).Subscribe( _ => StatusBarManager());
         StateManager.Instance.ObserveEveryValueChanged(x => x.matchingRequestStatus).Subscribe( _ => LoadComment());
         if (StateManager.Instance.userid == 0)RequestSender.Instance.SubmitMakeIDRequest(); //ユーザーidないとき
-        if (StateManager.Instance.nogashiTimes!=0){
-            nogashiTimesMess.text = ""+(StateManager.Instance.nogashiTimes+1)+"回目!";
-            }else{
-                nogashiTimesMess.text = "初めて!";
-            }
+        if (StateManager.Instance.nogashiTimes != 0) {
+            nogashiTimesMess.text = "" + (StateManager.Instance.nogashiTimes + 1) + "回目!";
+        } else {
+            nogashiTimesMess.text = "初めて!";
+        }
     }
 
     public void StatusBarManager() {//MatchingStateが変わった時よばれる
         StatusBar.SetActive((StateManager.Instance.matchingState == MatchingState.Matching));
         if (StateManager.Instance.matchingState == MatchingState.Matched) {
+            CreateMessWindow("マッチング過料", "相乗り相手が見つかったのでタクシーを呼びました。地図の赤い点に移動してタクシーを待ちましょう");
             CreatingMap.Instance.UpdateTaxi(StateManager.Instance.taxi_lat, StateManager.Instance.taxi_lng);
         }
         if (StateManager.Instance.matchingState == MatchingState.TaxiCome) {
@@ -67,9 +65,9 @@ public class UIManager : SingletonMonoBehaviour<UIManager> {
         WindowObj[(int)StateManager.Instance.uiState].SetActive(true);
         //Debug.Log("from:" + uiState + "to:" + StateManager.Instance.uiState);
         uiState = StateManager.Instance.uiState;
-        if (uiState == UIState.WriteComment)CreatingMap.Instance.GetMap(here_lat,here_lng);
+        if (uiState == UIState.WriteComment)CreatingMap.Instance.GetMap(StateManager.Instance.here_lat, StateManager.Instance.here_lng);
         if (uiState == UIState.Map) {   //マップに遷移した時はコメント読みこみ
-            CreatingMap.Instance.GetMap(here_lat,here_lng);
+            CreatingMap.Instance.GetMap(StateManager.Instance.here_lat, StateManager.Instance.here_lng);
             CreatingMap.Instance.UpDateComment();
         }
     }
@@ -98,11 +96,16 @@ public class UIManager : SingletonMonoBehaviour<UIManager> {
     }
 
     public void SubmitSettingConfirmRequest() {
-        RequestSender.Instance.SubmitAddressToGeometryRequest(Adress.text);
-        StateManager .Instance.ObserveEveryValueChanged(x => x.addressToGeometryRequestStatus).Subscribe( _ => CompleteSettingRequest());
+        if (Adress.text != "") {
+            CreateMessWindow("登録完了", "目的地を登録しました。戻るボタンで戻ってください。");
+            RequestSender.Instance.SubmitAddressToGeometryRequest(Adress.text);
+            StateManager .Instance.ObserveEveryValueChanged(x => x.addressToGeometryRequestStatus).Subscribe( _ => CompleteSettingRequest());
+            }else{
+                CreateMessWindow("", "住所を入力してください");
+            }
     }
-    public void CompleteSettingRequest(){
-        CreatingMap.Instance.GetMap(StateManager.Instance.ad_lat,StateManager.Instance.ad_lng);
+    public void CompleteSettingRequest() {
+        CreatingMap.Instance.GetMap(StateManager.Instance.ad_lat, StateManager.Instance.ad_lng);
     }
 
     public void GetAddressLatLng() {
@@ -114,20 +117,28 @@ public class UIManager : SingletonMonoBehaviour<UIManager> {
         }
     }
 
-    public void SubmitCommentLikeFightAdd(LikeFightSendRequest.CommentType type,int commentid){
-        Debug.Log("type"+type);
+
+
+    public void SubmitCommentLikeFightAdd(LikeFightSendRequest.CommentType type, int commentid) {
+        Debug.Log("type" + type);
         LikeFightSendRequest.RequestData data = new LikeFightSendRequest.RequestData();
         data.comment_id = commentid;
-        data.type = type;  
+        data.type = type;
         RequestSender.Instance.SubmitLikeFightSendRequest(data);
         //StateManager .Instance.ObserveEveryValueChanged(x => x.likeFightSendRequestStatus).Subscribe( _ => CompleteSendLikeandGettingComment());
     }
 
-    public void CompleteSendLikeandGettingComment(){
+    public void CompleteSendLikeandGettingComment() {
         //if (StateManager.Instance.likeFightSendRequestStatus == RequestStatus.Success){
-            Debug.Log("GetComment");
-            CreatingMap.Instance.UpDateComment();
+        //Debug.Log("GetComment");
+        CreatingMap.Instance.UpDateComment();
         //}
+    }
+
+    private void CreateMessWindow(string title, string mess) {
+        GameObject tmp = Instantiate(Resources.Load("Prefabs/messWindow")) as GameObject;
+        tmp.GetComponent<ItemWindow>().setText("exp", mess);
+        tmp.GetComponent<ItemWindow>().setText("title", title);
     }
 
 

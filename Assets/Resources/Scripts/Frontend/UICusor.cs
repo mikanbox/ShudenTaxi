@@ -27,11 +27,11 @@ public class UICusor : MonoBehaviour {
     }
 
 
-
     public void fightPush(int i, GameObject win) {
         if (isFighted ==false){
+            fight++;
             UIManager.Instance.SubmitCommentLikeFightAdd(LikeFightSendRequest.CommentType.fight,id);
-            win.GetComponent<ItemWindow>().setText("exp1num", "" + (fight+1)  );
+            win.GetComponent<ItemWindow>().setText("exp1num", "" + (fight)  );
             win.GetComponent<ItemWindow>().setColor("icon1",new Color(0.9f,0.6f,0.3f));
             isFighted = true;
         }
@@ -39,8 +39,9 @@ public class UICusor : MonoBehaviour {
 
     public void likePush(int i, GameObject win) {
         if (isLiked ==false){
+            like++;
             UIManager.Instance.SubmitCommentLikeFightAdd(LikeFightSendRequest.CommentType.like,id);
-            win.GetComponent<ItemWindow>().setText("exp2num", "" + (like+1)  );
+            win.GetComponent<ItemWindow>().setText("exp2num", "" + (like)  );
             win.GetComponent<ItemWindow>().setColor("icon2",new Color(0.9f,0.6f,0.3f));
             isLiked = true;
         }
